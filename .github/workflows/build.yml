@@ -1,0 +1,32 @@
+name: Build AutoForce
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Get the matching OpenRA source
+        run: git clone --depth 1 --branch release-20250330 https://github.com/OpenRA/OpenRA.git openra
+
+      - name: Generate the mod, run checks and compile
+        run: python3 install.py openra
+
+      - name: Package for players
+        run: |
+          mkdir -p out/mods
+          cp -r openra/mods/autoforce out/mods/autoforce
+          cp openra/bin/OpenRA.Mods.AutoForce.dll out/
+          cp INSTALL-FOR-PLAYERS.txt out/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AutoForce-for-OpenRA-20250330
+          path: out
