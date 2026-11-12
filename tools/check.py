@@ -30,6 +30,7 @@ def cs_fields(cls_file, cls_name):
 
 helix_fields = cs_fields("Traits/HelixNode.cs", "HelixNodeInfo")
 squad_fields = cs_fields("Traits/AutoSquad.cs", "AutoSquadInfo")
+cs_fields_extra = {"onde": cs_fields("Traits/OnDemandBuild.cs", "OnDemandBuildInfo")}
 effects = set(re.findall(r"(\w+),", re.search(r"enum HelixEffect\s*\{(.*?)\}", open(os.path.join(cs_dir, "Traits/HelixNode.cs")).read(), re.S).group(1).replace("//", "\n//").replace("\n//", "\n#")))
 sides = {"Quantity", "Quality"}
 
@@ -80,6 +81,10 @@ for name, a in actors.items():
             major = t["kv"].get("Major") == "true"
             if major != (int(t["kv"]["Tier"]) % 3 == 0):
                 err("%s: Major flag wrong at tier %s" % (name, t["kv"]["Tier"]))
+            if t["kv"]["Effect"] == "Condition" and "Condition" not in t["kv"]:
+                err("%s %s: Condition effect without Condition" % (name, t["name"]))
+            if t["kv"]["Effect"] in ("Armor", "Storage") and "Value" not in t["kv"]:
+                err("%s %s: missing Value" % (name, t["name"]))
             eff = t["kv"]["Effect"]
             if eff in ("Speed", "FireRate", "Damage") and "Value" not in t["kv"]:
                 err("%s %s: missing Value" % (name, t["name"]))
@@ -92,8 +97,19 @@ for name, a in actors.items():
             if bad:
                 err("%s: unknown AutoSquad fields %s" % (name, sorted(bad)))
     if ids:
-        if sorted(tiers) != list(range(1, 10)) or any(sorted(v) != ["Quality", "Quantity"] for v in tiers.values()):
-            err("%s: helix must have exactly one Quantity + one Quality node on tiers 1-9" % name)
+        n_t = len(tiers)
+        if n_t not in (6, 9) or sorted(tiers) != list(range(1, n_t + 1)) or any(sorted(v) != ["Quality", "Quantity"] for v in tiers.values()):
+            err("%s: helix must have one Quantity + one Quality node on every tier (6 or 9 tiers)" % name)
+        # every granted condition must be consumed by a trait of this actor or by ^BasicBuilding
+        for t in a["traits"]:
+            if t["name"].startswith("HelixNode@") and t["kv"].get("Effect") == "Condition":
+                c = t["kv"]["Condition"]
+                used = any(x["kv"].get("RequiresCondition") == c for x in a["traits"])
+                if not used:
+                    err("%s: condition %s is granted but nothing requires it" % (name, c))
+                if not any(x["kv"].get("Prerequisites") == c for x in actors.get("^BasicBuilding", {"traits": []})["traits"]) \
+                        and not any(x["name"].startswith("Power@") and x["kv"].get("RequiresCondition") == c for x in a["traits"]):
+                    err("%s: condition %s has no effect" % (name, c))
 
 # ---- parents, removals, exits ---------------------------------------------
 ra_rules = ""
@@ -108,6 +124,16 @@ def ra_block(actor):
     ms = re.findall(r"^%s:\n((?:\t.*\n|\n)*)" % re.escape(actor), ra_rules, re.M)
     return "".join(ms) if ms else None
 
+
+ONDEMAND = cs_fields("Traits/OnDemandBuild.cs", "OnDemandBuildInfo")
+for name, a in actors.items():
+    for t in a["traits"]:
+        if t["name"] == "OnDemandBuild":
+            bad = set(t["kv"]) - ONDEMAND
+            if bad:
+                err("%s: unknown OnDemandBuild fields %s" % (name, sorted(bad)))
+            if "Unit" not in t["kv"]:
+                err("%s: OnDemandBuild needs Unit" % name)
 
 for name, a in actors.items():
     inh = next((t["value"] for t in a["traits"] if t["name"] == "Inherits"), None)
@@ -125,8 +151,18 @@ for name, a in actors.items():
             if re.match(r"Exit@\d", t["name"]) and blk is not None:
                 if not re.search(r"^\t%s:" % re.escape(t["name"]), blk, re.M):
                     err("%s overrides %s which %s lacks" % (name, t["name"], inh))
-    elif name in ("TENT", "BARR", "WEAP", "PROC") and ra_block(name) is None:
+    elif name.startswith("^") or name == "World":
+        pass
+    elif ra_block(name) is None:
         err("%s missing in RA rules" % name)
+    else:
+        blk = ra_block(name)
+        for t in a["traits"]:
+            if t["name"].startswith("-") and not re.search(r"^\t%s:" % re.escape(t["name"][1:]), blk, re.M):
+                err("%s removes %s which RA does not define" % (name, t["name"][1:]))
+            if re.match(r"Exit@", t["name"]) and "ProductionTypes" in t["kv"] and not re.search(r"^\t%s:" % re.escape(t["name"]), blk, re.M) \
+                    and name not in ("FIX", "PROC"):
+                err("%s overrides %s which RA lacks" % (name, t["name"]))
 
 # the unit-producing buildings must keep an Exit usable by their production type
 for name, a in actors.items():
@@ -135,8 +171,10 @@ for name, a in actors.items():
         continue
     ptype = ap["kv"].get("ProductionType")
     prod = next((t for t in a["traits"] if t["name"] == "Production"), None)
-    if prod is None or prod["kv"].get("Produces") != ptype:
-        err("%s: Production.Produces must equal AutoSquad.ProductionType (%s)" % (name, ptype))
+    if ptype is None:
+        continue
+    if prod is None or ptype not in [x.strip() for x in prod["kv"].get("Produces", "").split(",")]:
+        err("%s: Production.Produces must include AutoSquad.ProductionType (%s)" % (name, ptype))
 
 # ---- fluent keys -----------------------------------------------------------
 ftl = open(os.path.join(mod, "fluent", "autoforce.ftl"), encoding="utf-8").read()

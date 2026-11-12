@@ -26,9 +26,9 @@ namespace OpenRA.Mods.AutoForce.Widgets
 	public class HelixTreeWidget : Widget
 	{
 		// Matches the sidebar's production container in mods/ra/chrome/ingame-player.yaml.
-		const int SidebarRightMargin = 250;
+		const int SidebarRightMargin = 210; // 40px right of the sidebar edge: the build tabs stay uncovered
 		const int SidebarTop = 300;
-		const int PanelWidth = 238;
+		const int PanelWidth = 198;
 
 		const int HeaderHeight = 40;
 		const int FooterHeight = 150;
@@ -52,6 +52,10 @@ namespace OpenRA.Mods.AutoForce.Widgets
 		AutoSquad squad;
 		Actor squadActor;
 		Actor suppressedActor;
+		OnDemandBuild demand;
+		Actor lastFound;
+		ProductionPaletteWidget palette;
+		ProductionQueue queueWhenOpened;
 		HelixNodeInfo hovered;
 		bool buildButtonHovered;
 		int maxTier;
@@ -68,6 +72,7 @@ namespace OpenRA.Mods.AutoForce.Widgets
 		{
 			Actor found = null;
 			AutoSquad foundSquad = null;
+			OnDemandBuild foundDemand = null;
 
 			if (world.LocalPlayer != null)
 			{
@@ -83,6 +88,14 @@ namespace OpenRA.Mods.AutoForce.Widgets
 						foundSquad = s;
 						break;
 					}
+
+					var d = a.TraitOrDefault<OnDemandBuild>();
+					if (d != null)
+					{
+						found = a;
+						foundDemand = d;
+						break;
+					}
 				}
 			}
 
@@ -90,14 +103,40 @@ namespace OpenRA.Mods.AutoForce.Widgets
 			if (suppressedActor != null && found != suppressedActor)
 				suppressedActor = null;
 
+			// Clicking one of the sidebar tabs (buildings / defenses ...) switches the palette's queue:
+			// treat that as "I want the build menu" and step aside until the selection changes.
+			if (palette == null)
+				palette = Ui.Root.GetOrNull<ProductionPaletteWidget>("PRODUCTION_PALETTE");
+
+			var queueNow = palette != null ? palette.CurrentQueue : null;
+			if (found != lastFound)
+			{
+				lastFound = found;
+				queueWhenOpened = queueNow;
+			}
+			else if (found != null && found != suppressedActor && queueNow != queueWhenOpened)
+				suppressedActor = found;
+
 			if (found != null && found == suppressedActor)
 			{
 				found = null;
 				foundSquad = null;
+				foundDemand = null;
 			}
 
 			squadActor = found;
 			squad = foundSquad;
+			demand = foundDemand;
+
+			if (demand != null)
+			{
+				var scr = Game.Renderer.Resolution;
+				Bounds = new WidgetBounds(scr.Width - SidebarRightMargin, SidebarTop, PanelWidth, 128);
+				var m = Viewport.LastMousePos;
+				buildButtonHovered = BuildButtonRect().Contains(m);
+				hovered = null;
+				return;
+			}
 
 			if (squad == null)
 			{
@@ -159,8 +198,27 @@ namespace OpenRA.Mods.AutoForce.Widgets
 			return null;
 		}
 
+		Rectangle DemandButtonRect()
+		{
+			var o = RenderOrigin;
+			return new Rectangle(o.X + 10, o.Y + 56, PanelWidth - 20, 26);
+		}
+
 		public override bool HandleMouseInput(MouseInput mi)
 		{
+			if (demand != null)
+			{
+				if (mi.Event == MouseInputEvent.Down && mi.Button == MouseButton.Left)
+				{
+					if (BuildButtonRect().Contains(mi.Location))
+						suppressedActor = squadActor;
+					else if (DemandButtonRect().Contains(mi.Location) && !demand.Building)
+						world.IssueOrder(new Order(OnDemandBuild.BuildOrder, squadActor, false));
+				}
+
+				return mi.Event != MouseInputEvent.Move;
+			}
+
 			if (squad == null)
 				return false;
 
@@ -270,8 +328,55 @@ namespace OpenRA.Mods.AutoForce.Widgets
 			return y;
 		}
 
+		void DrawDemand()
+		{
+			var o = RenderOrigin;
+			var panel = new Rectangle(o.X, o.Y, Bounds.Width, Bounds.Height);
+			WidgetUtils.FillRectWithColor(panel, PanelColor);
+			WidgetUtils.FillRectWithColor(new Rectangle(panel.X, panel.Y, panel.Width, 2), BorderColor);
+			WidgetUtils.FillRectWithColor(new Rectangle(panel.X, panel.Bottom - 2, panel.Width, 2), BorderColor);
+			WidgetUtils.FillRectWithColor(new Rectangle(panel.X, panel.Y, 2, panel.Height), BorderColor);
+			WidgetUtils.FillRectWithColor(new Rectangle(panel.Right - 2, panel.Y, 2, panel.Height), BorderColor);
+
+			Text("Bold", "Service Depot", o.X + 10, o.Y + 8, TextColor);
+			var tb = BuildButtonRect();
+			WidgetUtils.FillRectWithColor(tb, buildButtonHovered ? Color.FromArgb(255, 60, 68, 80) : Color.FromArgb(255, 32, 38, 46));
+			TextCentered("TinyBold", "< Build", tb.X + tb.Width / 2f, tb.Y + 4, TextColor);
+			TextCentered("Tiny", AutoSquad.BuildStamp, o.X + PanelWidth / 2f, o.Y + 32, DimColor);
+
+			var cash = world.LocalPlayer.PlayerActor.Trait<PlayerResources>().GetCashAndResources();
+			var button = DemandButtonRect();
+			var canAfford = cash >= demand.Cost;
+			var enabled = !demand.Building && canAfford;
+			var hover = button.Contains(Viewport.LastMousePos);
+			WidgetUtils.FillRectWithColor(button, enabled ? (hover ? Color.FromArgb(255, 56, 110, 60) : Color.FromArgb(255, 36, 80, 42)) : Color.FromArgb(255, 34, 38, 44));
+			WidgetUtils.FillRectWithColor(new Rectangle(button.X, button.Y, button.Width, 1), BorderColor);
+			WidgetUtils.FillRectWithColor(new Rectangle(button.X, button.Bottom - 1, button.Width, 1), BorderColor);
+			TextCentered("Bold", "Build " + demand.UnitName + (demand.Cost > 0 ? "  $" + demand.Cost : ""), button.X + button.Width / 2f, button.Y + 6, enabled ? TextColor : SubTextColor);
+
+			var y = button.Bottom + 8;
+			if (demand.Building)
+			{
+				var bar = new Rectangle(o.X + 10, y, PanelWidth - 20, 8);
+				WidgetUtils.FillRectWithColor(bar, DimColor);
+				var frac = 1f - demand.TicksLeft / (float)demand.TicksTotal;
+				WidgetUtils.FillRectWithColor(new Rectangle(bar.X, bar.Y, (int)(bar.Width * frac), bar.Height), QualityColor);
+				y += 14;
+			}
+
+			var status = !demand.Building && !canAfford ? "Not enough funds" : demand.Status;
+			var bad = demand.StatusIsProblem || (!demand.Building && !canAfford);
+			WrappedText("Small", status, o.X + 10, y, PanelWidth - 20, 2, 13, bad ? BadColor : GoodColor);
+		}
+
 		public override void Draw()
 		{
+			if (demand != null)
+			{
+				DrawDemand();
+				return;
+			}
+
 			if (squad == null)
 				return;
 
@@ -440,7 +545,7 @@ namespace OpenRA.Mods.AutoForce.Widgets
 			}
 			else
 			{
-				Text("Bold", "Squad", x, y, TextColor);
+				Text("Bold", squad.HasUnits ? "Squad" : "Base", x, y, TextColor);
 				var line = 0;
 				foreach (var c in squad.Composition())
 				{
@@ -451,7 +556,12 @@ namespace OpenRA.Mods.AutoForce.Widgets
 
 				WrappedText("Small", squad.Status, x, o.Y + Bounds.Height - 58, textWidth, 2, 13, squad.StatusIsProblem ? BadColor : GoodColor);
 
-				var bonus = "Spd +" + squad.SpeedBonus + "%  Dmg +" + squad.DamageBonus + "%  Rate +" + squad.FireRateBonus + "%";
+				var bonus = squad.Info.AffectsAllHarvesters
+					? "Spd +" + squad.SpeedBonus + "%  Armor +" + squad.ArmorBonus + "%  Silo +" + squad.StorageBonus
+					: !squad.HasUnits
+						? "Applies to the whole base"
+						: "Spd +" + squad.SpeedBonus + "%  Dmg +" + squad.DamageBonus + "%  Rate +" + squad.FireRateBonus + "%" +
+							(squad.ArmorBonus > 0 ? "  Arm +" + squad.ArmorBonus + "%" : "");
 				Text("Tiny", bonus, x, o.Y + Bounds.Height - 30, QualityColor);
 			}
 

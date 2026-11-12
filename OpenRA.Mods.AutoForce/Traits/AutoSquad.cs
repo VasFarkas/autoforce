@@ -22,12 +22,17 @@ namespace OpenRA.Mods.AutoForce.Traits
 		"exposes the helix upgrade tree. Needs a Production trait and at least one Exit.")]
 	public class AutoSquadInfo : TraitInfo, Requires<ProductionInfo>
 	{
-		[FieldLoader.Require]
 		[Desc("Squad at the start: actor name -> number of units to maintain.")]
 		public readonly Dictionary<string, int> Roster = new Dictionary<string, int>();
 
 		[Desc("Production type used to choose an Exit (must match an Exit's ProductionTypes, or the Exit must have none).")]
 		public readonly string ProductionType = "AutoInfantry";
+
+			[Desc("Per-unit production type (actor name -> type), for buildings with several kinds of exits, e.g. submarines.")]
+			public readonly Dictionary<string, string> ProductionTypeOverrides = new Dictionary<string, string>();
+
+			[Desc("Speed and armor upgrades from this building apply to every harvester the owner has (Ore Refinery).")]
+			public readonly bool AffectsAllHarvesters = false;
 
 		[Desc("Ticks between two spawns (25 ticks are roughly one second at normal game speed).")]
 		public readonly int SpawnInterval = 150;
@@ -45,10 +50,10 @@ namespace OpenRA.Mods.AutoForce.Traits
 		public override object Create(ActorInitializer init) { return new AutoSquad(init.Self, this); }
 	}
 
-	public class AutoSquad : ITick, IResolveOrder, INotifyProduction
+	public class AutoSquad : ITick, IResolveOrder, INotifyProduction, INotifyOwnerChanged, INotifyActorDisposing, INotifyKilled
 	{
 		public const string ResearchOrder = "AutoForceResearch";
-		public const string BuildStamp = "AutoForce build 3";
+		public const string BuildStamp = "AutoForce build 4";
 
 		public readonly AutoSquadInfo Info;
 		public readonly List<HelixNodeInfo> Nodes;
@@ -63,7 +68,10 @@ namespace OpenRA.Mods.AutoForce.Traits
 		Production production;
 		string lastElite;
 		int spawnTimer;
-		int speedBonus, damageBonus, fireRateBonus;
+		int speedBonus, damageBonus, fireRateBonus, armorBonus, storageBonus;
+		bool storageApplied;
+		readonly List<int> conditionTokens = new List<int>();
+		readonly Dictionary<string, string> typeOverrides = new Dictionary<string, string>();
 
 		/// <summary>What the building is doing right now, shown in the helix panel.</summary>
 		public string Status { get; private set; }
@@ -90,6 +98,9 @@ namespace OpenRA.Mods.AutoForce.Traits
 				target[name] = kv.Value;
 			}
 
+			foreach (var kv in info.ProductionTypeOverrides)
+				typeOverrides[kv.Key.ToLowerInvariant()] = kv.Value;
+
 			Nodes = self.Info.TraitInfos<HelixNodeInfo>().OrderBy(n => n.Tier).ThenBy(n => n.Side).ToList();
 		}
 
@@ -112,6 +123,9 @@ namespace OpenRA.Mods.AutoForce.Traits
 		public int SpeedBonus { get { return speedBonus; } }
 		public int DamageBonus { get { return damageBonus; } }
 		public int FireRateBonus { get { return fireRateBonus; } }
+		public int ArmorBonus { get { return armorBonus; } }
+		public int StorageBonus { get { return storageBonus; } }
+		public bool HasUnits { get { return unitOrder.Count > 0; } }
 
 		/// <summary>Current squad plan as (actor name, wanted, alive) in spawn priority order.</summary>
 		public IEnumerable<(string Unit, int Wanted, int Alive)> Composition()
@@ -230,6 +244,18 @@ namespace OpenRA.Mods.AutoForce.Traits
 				case HelixEffect.Damage:
 					damageBonus += node.Value;
 					break;
+				case HelixEffect.Armor:
+					armorBonus += node.Value;
+					break;
+				case HelixEffect.Storage:
+					storageBonus += node.Value;
+					self.Owner.PlayerActor.Trait<PlayerResources>().AddStorageCapacity(node.Value);
+					storageApplied = true;
+					break;
+				case HelixEffect.Condition:
+					if (!string.IsNullOrEmpty(node.Condition))
+						conditionTokens.Add(self.GrantCondition(node.Condition));
+					break;
 				case HelixEffect.AddUnit:
 					AddWanted(node.Unit, node.Count);
 					if (node.Major && node.Unit != null)
@@ -278,14 +304,68 @@ namespace OpenRA.Mods.AutoForce.Traits
 
 		void ApplyBonuses(Actor unit)
 		{
+			if (Info.AffectsAllHarvesters)
+				return; // handled by ApplyToAllHarvesters
+
 			var sm = unit.TraitOrDefault<SquadMember>();
 			if (sm == null)
 				return;
 
 			// Fire rate: +20% means 100 / 1.2 of the original reload delay.
 			var reload = Math.Max(25, 10000 / (100 + fireRateBonus));
-			sm.SetBonuses(100 + speedBonus, 100 + damageBonus, reload);
+			sm.SetBonuses(100 + speedBonus, 100 + damageBonus, reload, 100 - armorBonus);
 		}
+
+		void ApplyToAllHarvesters()
+		{
+			var speed = 0;
+			var armor = 0;
+			foreach (var a in self.World.ActorsHavingTrait<AutoSquad>())
+			{
+				if (a.IsDead || a.Owner != self.Owner)
+					continue;
+
+				var s = a.Trait<AutoSquad>();
+				if (!s.Info.AffectsAllHarvesters)
+					continue;
+
+				speed = Math.Max(speed, s.speedBonus);
+				armor = Math.Max(armor, s.armorBonus);
+			}
+
+			foreach (var h in self.World.ActorsHavingTrait<Harvester>())
+			{
+				if (h.IsDead || h.Owner != self.Owner)
+					continue;
+
+				var sm = h.TraitOrDefault<SquadMember>();
+				if (sm != null)
+					sm.SetBonuses(100 + speed, 100, 100, 100 - armor);
+			}
+		}
+
+		void RemoveStorage(Player owner)
+		{
+			if (!storageApplied)
+				return;
+
+			storageApplied = false;
+			owner.PlayerActor.Trait<PlayerResources>().RemoveStorageCapacity(storageBonus);
+		}
+
+		void INotifyOwnerChanged.OnOwnerChanged(Actor self, Player oldOwner, Player newOwner)
+		{
+			if (storageBonus > 0 && storageApplied)
+			{
+				RemoveStorage(oldOwner);
+				newOwner.PlayerActor.Trait<PlayerResources>().AddStorageCapacity(storageBonus);
+				storageApplied = true;
+			}
+		}
+
+		void INotifyActorDisposing.Disposing(Actor self) { RemoveStorage(self.Owner); }
+
+		void INotifyKilled.Killed(Actor self, AttackInfo e) { RemoveStorage(self.Owner); }
 
 		void INotifyProduction.UnitProduced(Actor self, Actor other, CPos exit)
 		{
@@ -304,6 +384,12 @@ namespace OpenRA.Mods.AutoForce.Traits
 			}
 		}
 
+		string ProductionTypeFor(string unit)
+		{
+			string t;
+			return typeOverrides.TryGetValue(unit, out t) ? t : Info.ProductionType;
+		}
+
 		string NextWanted()
 		{
 			foreach (var u in unitOrder)
@@ -320,13 +406,16 @@ namespace OpenRA.Mods.AutoForce.Traits
 
 			members.RemoveAll(m => m.IsDead || m.Owner != self.Owner);
 
+			if (Info.AffectsAllHarvesters && (self.World.WorldTick + self.ActorID) % 25 == 0)
+				ApplyToAllHarvesters();
+
 			if (spawnTimer > 0)
 				spawnTimer--;
 
 			var next = NextWanted();
 			if (next == null)
 			{
-				Status = "Squad is at full strength";
+				Status = unitOrder.Count == 0 ? "Upgrades apply to your whole base" : "Squad is at full strength";
 				StatusIsProblem = false;
 				return;
 			}
@@ -377,7 +466,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 				new FactionInit(production.Faction)
 			};
 
-			if (production.Produce(self, actorInfo, Info.ProductionType, inits, 0))
+			if (production.Produce(self, actorInfo, ProductionTypeFor(next), inits, 0))
 			{
 				if (cost > 0)
 					resources.TakeCash(cost);
@@ -389,7 +478,9 @@ namespace OpenRA.Mods.AutoForce.Traits
 			}
 			else
 			{
-				if (production.IsTraitDisabled)
+				if (Reservable.IsReserved(self))
+					Block("waiting for a free landing pad / dock");
+				else if (production.IsTraitDisabled)
 					Block("production is disabled (low power or condition)");
 				else if (production.IsTraitPaused)
 					Block("production is paused");

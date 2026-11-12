@@ -6,8 +6,40 @@
 ^Vehicle:
 	SquadMember:
 
+^Ship:
+	SquadMember:
+
+^Plane:
+	SquadMember:
+
 World:
 	AutoForceUI:
+
+^BasicBuilding:
+	ProductionTimeMultiplier@afb1:
+		Multiplier: 96
+		Prerequisites: afb1
+		Queue: Building, Defense
+	ProductionTimeMultiplier@afb2:
+		Multiplier: 96
+		Prerequisites: afb2
+		Queue: Building, Defense
+	ProductionTimeMultiplier@afb3:
+		Multiplier: 94
+		Prerequisites: afb3
+		Queue: Building, Defense
+	ProductionTimeMultiplier@afb4:
+		Multiplier: 97
+		Prerequisites: afb4
+		Queue: Building, Defense
+	ProductionTimeMultiplier@afb5:
+		Multiplier: 97
+		Prerequisites: afb5
+		Queue: Building, Defense
+	ProductionTimeMultiplier@afb6:
+		Multiplier: 94
+		Prerequisites: afb6
+		Queue: Building, Defense
 
 TENT:
 	Buildable:
@@ -21,19 +53,930 @@ WEAP:
 	Buildable:
 		Prerequisites: ~disabled
 
-PROC:
+HPAD:
 	Production:
-		Produces: AutoHarv
+		Produces: AutoAir
+	-ProductionBar:
+	AutoSquad:
+		ProductionType: AutoAir
+		SpawnInterval: 300
+		InitialDelay: 150
+		Roster:
+			HELI: 2
+	HelixNode@ql1:
+		Id: ql1
+		Side: Quality
+		Tier: 1
+		Name: Light Rotors
+		Description: Squad moves 10% faster.
+		Cost: 350
+		Duration: 550
+		Effect: Speed
+		Value: 10
+	HelixNode@qn1:
+		Id: qn1
+		Side: Quantity
+		Tier: 1
+		Name: Transport Chopper
+		Description: Adds a Chinook.
+		Cost: 350
+		Duration: 550
+		Effect: AddUnit
+		Unit: TRAN
+		Count: 1
+	HelixNode@ql2:
+		Id: ql2
+		Side: Quality
+		Tier: 2
+		Name: Hardened Rockets
+		Description: Squad deals 10% more damage.
+		Cost: 500
+		Duration: 725
+		Effect: Damage
+		Value: 10
+	HelixNode@qn2:
+		Id: qn2
+		Side: Quantity
+		Tier: 2
+		Name: Extra Longbow
+		Description: Adds a Longbow.
+		Cost: 500
+		Duration: 725
+		Effect: AddUnit
+		Unit: HELI
+		Count: 1
+	HelixNode@ql3:
+		Id: ql3
+		Side: Quality
+		Tier: 3
+		Major: true
+		Name: Hind Conversion
+		Description: MAJOR: 1 Longbow becomes a Hind gunship.
+		Cost: 1100
+		Duration: 1200
+		Effect: Replace
+		Unit: HIND
+		From: HELI
+		Count: 1
+	HelixNode@qn3:
+		Id: qn3
+		Side: Quantity
+		Tier: 3
+		Major: true
+		Name: Gunship Section
+		Description: MAJOR: adds a Hind gunship.
+		Cost: 1100
+		Duration: 1200
+		Effect: AddUnit
+		Unit: HIND
+		Count: 1
+	HelixNode@ql4:
+		Id: ql4
+		Side: Quality
+		Tier: 4
+		Name: Auto Loaders
+		Description: Squad fires 10% faster.
+		Cost: 650
+		Duration: 900
+		Effect: FireRate
+		Value: 10
+	HelixNode@qn4:
+		Id: qn4
+		Side: Quantity
+		Tier: 4
+		Name: Reinforce Elites
+		Description: Adds 1 more of your newest special aircraft.
+		Cost: 650
+		Duration: 900
+		Effect: AddElite
+		Count: 1
+	HelixNode@ql5:
+		Id: ql5
+		Side: Quality
+		Tier: 5
+		Name: Armor-Piercing Rockets
+		Description: Squad deals 15% more damage.
+		Cost: 800
+		Duration: 1075
+		Effect: Damage
+		Value: 15
+	HelixNode@qn5:
+		Id: qn5
+		Side: Quantity
+		Tier: 5
+		Name: Third Longbow
+		Description: Adds another Longbow.
+		Cost: 800
+		Duration: 1075
+		Effect: AddUnit
+		Unit: HELI
+		Count: 1
+	HelixNode@ql6:
+		Id: ql6
+		Side: Quality
+		Tier: 6
+		Major: true
+		Name: Gunship Wing
+		Description: MAJOR: another Longbow becomes a Hind gunship.
+		Cost: 1800
+		Duration: 1650
+		Effect: Replace
+		Unit: HIND
+		From: HELI
+		Count: 1
+	HelixNode@qn6:
+		Id: qn6
+		Side: Quantity
+		Tier: 6
+		Major: true
+		Name: Gunship Squadron
+		Description: MAJOR: adds 2 Hind gunships.
+		Cost: 1800
+		Duration: 1650
+		Effect: AddUnit
+		Unit: HIND
+		Count: 2
+
+AFLD:
+	Production:
+		Produces: AutoAir
+	-ProductionBar:
+	AutoSquad:
+		ProductionType: AutoAir
+		SpawnInterval: 300
+		InitialDelay: 150
+		Roster:
+			YAK: 2
+	HelixNode@ql1:
+		Id: ql1
+		Side: Quality
+		Tier: 1
+		Name: Afterburner Tuning
+		Description: Squad moves 10% faster.
+		Cost: 350
+		Duration: 550
+		Effect: Speed
+		Value: 10
+	HelixNode@qn1:
+		Id: qn1
+		Side: Quantity
+		Tier: 1
+		Name: Extra Yak
+		Description: Adds a Yak.
+		Cost: 350
+		Duration: 550
+		Effect: AddUnit
+		Unit: YAK
+		Count: 1
+	HelixNode@ql2:
+		Id: ql2
+		Side: Quality
+		Tier: 2
+		Name: Hardened Rounds
+		Description: Squad deals 10% more damage.
+		Cost: 500
+		Duration: 725
+		Effect: Damage
+		Value: 10
+	HelixNode@qn2:
+		Id: qn2
+		Side: Quantity
+		Tier: 2
+		Name: Extra Yak II
+		Description: Adds another Yak.
+		Cost: 500
+		Duration: 725
+		Effect: AddUnit
+		Unit: YAK
+		Count: 1
+	HelixNode@ql3:
+		Id: ql3
+		Side: Quality
+		Tier: 3
+		Major: true
+		Name: MiG Conversion
+		Description: MAJOR: 1 Yak becomes a MiG.
+		Cost: 1100
+		Duration: 1200
+		Effect: Replace
+		Unit: MIG
+		From: YAK
+		Count: 1
+	HelixNode@qn3:
+		Id: qn3
+		Side: Quantity
+		Tier: 3
+		Major: true
+		Name: MiG Flight
+		Description: MAJOR: adds a MiG.
+		Cost: 1100
+		Duration: 1200
+		Effect: AddUnit
+		Unit: MIG
+		Count: 1
+	HelixNode@ql4:
+		Id: ql4
+		Side: Quality
+		Tier: 4
+		Name: Auto Loaders
+		Description: Squad fires 10% faster.
+		Cost: 650
+		Duration: 900
+		Effect: FireRate
+		Value: 10
+	HelixNode@qn4:
+		Id: qn4
+		Side: Quantity
+		Tier: 4
+		Name: Reinforce Elites
+		Description: Adds 1 more of your newest special aircraft.
+		Cost: 650
+		Duration: 900
+		Effect: AddElite
+		Count: 1
+	HelixNode@ql5:
+		Id: ql5
+		Side: Quality
+		Tier: 5
+		Name: Armor-Piercing Rounds
+		Description: Squad deals 15% more damage.
+		Cost: 800
+		Duration: 1075
+		Effect: Damage
+		Value: 15
+	HelixNode@qn5:
+		Id: qn5
+		Side: Quantity
+		Tier: 5
+		Name: Third Yak
+		Description: Adds another Yak.
+		Cost: 800
+		Duration: 1075
+		Effect: AddUnit
+		Unit: YAK
+		Count: 1
+	HelixNode@ql6:
+		Id: ql6
+		Side: Quality
+		Tier: 6
+		Major: true
+		Name: MiG Wing
+		Description: MAJOR: another Yak becomes a MiG.
+		Cost: 1800
+		Duration: 1650
+		Effect: Replace
+		Unit: MIG
+		From: YAK
+		Count: 1
+	HelixNode@qn6:
+		Id: qn6
+		Side: Quantity
+		Tier: 6
+		Major: true
+		Name: MiG Squadron
+		Description: MAJOR: adds 2 MiGs.
+		Cost: 1800
+		Duration: 1650
+		Effect: AddUnit
+		Unit: MIG
+		Count: 2
+
+SYRD:
+	Production:
+		Produces: AutoShip
+	-ProductionBar:
+	Exit@1:
+		ProductionTypes: AutoShip
+	Exit@2:
+		ProductionTypes: AutoShip
+	Exit@3:
+		ProductionTypes: AutoShip
+	Exit@4:
+		ProductionTypes: AutoShip
+	AutoSquad:
+		ProductionType: AutoShip
+		SpawnInterval: 400
+		InitialDelay: 200
+		Roster:
+			DD: 1
+			PT: 2
+	HelixNode@ql1:
+		Id: ql1
+		Side: Quality
+		Tier: 1
+		Name: Clean Hulls
+		Description: Squad moves 10% faster.
+		Cost: 350
+		Duration: 550
+		Effect: Speed
+		Value: 10
+	HelixNode@qn1:
+		Id: qn1
+		Side: Quantity
+		Tier: 1
+		Name: Extra Gunboat
+		Description: Adds a gunboat.
+		Cost: 350
+		Duration: 550
+		Effect: AddUnit
+		Unit: PT
+		Count: 1
+	HelixNode@ql2:
+		Id: ql2
+		Side: Quality
+		Tier: 2
+		Name: Hardened Shells
+		Description: Squad deals 10% more damage.
+		Cost: 500
+		Duration: 725
+		Effect: Damage
+		Value: 10
+	HelixNode@qn2:
+		Id: qn2
+		Side: Quantity
+		Tier: 2
+		Name: Extra Gunboat II
+		Description: Adds another gunboat.
+		Cost: 500
+		Duration: 725
+		Effect: AddUnit
+		Unit: PT
+		Count: 1
+	HelixNode@ql3:
+		Id: ql3
+		Side: Quality
+		Tier: 3
+		Major: true
+		Name: Cruiser Refit
+		Description: MAJOR: 1 destroyer becomes a cruiser.
+		Cost: 1100
+		Duration: 1200
+		Effect: Replace
+		Unit: CA
+		From: DD
+		Count: 1
+	HelixNode@qn3:
+		Id: qn3
+		Side: Quantity
+		Tier: 3
+		Major: true
+		Name: Destroyer Division
+		Description: MAJOR: adds a destroyer.
+		Cost: 1100
+		Duration: 1200
+		Effect: AddUnit
+		Unit: DD
+		Count: 1
+	HelixNode@ql4:
+		Id: ql4
+		Side: Quality
+		Tier: 4
+		Name: Auto Loaders
+		Description: Squad fires 10% faster.
+		Cost: 650
+		Duration: 900
+		Effect: FireRate
+		Value: 10
+	HelixNode@qn4:
+		Id: qn4
+		Side: Quantity
+		Tier: 4
+		Name: Reinforce Elites
+		Description: Adds 1 more of your newest special ship.
+		Cost: 650
+		Duration: 900
+		Effect: AddElite
+		Count: 1
+	HelixNode@ql5:
+		Id: ql5
+		Side: Quality
+		Tier: 5
+		Name: Armor-Piercing Shells
+		Description: Squad deals 15% more damage.
+		Cost: 800
+		Duration: 1075
+		Effect: Damage
+		Value: 15
+	HelixNode@qn5:
+		Id: qn5
+		Side: Quantity
+		Tier: 5
+		Name: Extra Destroyer
+		Description: Adds another destroyer.
+		Cost: 800
+		Duration: 1075
+		Effect: AddUnit
+		Unit: DD
+		Count: 1
+	HelixNode@ql6:
+		Id: ql6
+		Side: Quality
+		Tier: 6
+		Major: true
+		Name: Destroyer Squadron
+		Description: MAJOR: 2 gunboats become destroyers.
+		Cost: 1800
+		Duration: 1650
+		Effect: Replace
+		Unit: DD
+		From: PT
+		Count: 2
+	HelixNode@qn6:
+		Id: qn6
+		Side: Quantity
+		Tier: 6
+		Major: true
+		Name: Cruiser Detachment
+		Description: MAJOR: adds a cruiser.
+		Cost: 1800
+		Duration: 1650
+		Effect: AddUnit
+		Unit: CA
+		Count: 1
+
+SPEN:
+	Production:
+		Produces: AutoShip, AutoSub
+	-ProductionBar:
+	Exit@1:
+		ProductionTypes: AutoSub
+	Exit@2:
+		ProductionTypes: AutoSub
+	Exit@3:
+		ProductionTypes: AutoSub
+	Exit@4:
+		ProductionTypes: AutoSub
+	Exit@b1:
+		ProductionTypes: AutoShip
+	Exit@b2:
+		ProductionTypes: AutoShip
+	Exit@b3:
+		ProductionTypes: AutoShip
+	Exit@b4:
+		ProductionTypes: AutoShip
+	AutoSquad:
+		ProductionType: AutoShip
+		SpawnInterval: 400
+		InitialDelay: 200
+		ProductionTypeOverrides:
+			SS: AutoSub
+			MSUB: AutoSub
+		Roster:
+			SS: 2
+	HelixNode@ql1:
+		Id: ql1
+		Side: Quality
+		Tier: 1
+		Name: Quiet Props
+		Description: Squad moves 10% faster.
+		Cost: 350
+		Duration: 550
+		Effect: Speed
+		Value: 10
+	HelixNode@qn1:
+		Id: qn1
+		Side: Quantity
+		Tier: 1
+		Name: Extra Submarine
+		Description: Adds a submarine.
+		Cost: 350
+		Duration: 550
+		Effect: AddUnit
+		Unit: SS
+		Count: 1
+	HelixNode@ql2:
+		Id: ql2
+		Side: Quality
+		Tier: 2
+		Name: Hardened Torpedoes
+		Description: Squad deals 10% more damage.
+		Cost: 500
+		Duration: 725
+		Effect: Damage
+		Value: 10
+	HelixNode@qn2:
+		Id: qn2
+		Side: Quantity
+		Tier: 2
+		Name: Extra Submarine II
+		Description: Adds another submarine.
+		Cost: 500
+		Duration: 725
+		Effect: AddUnit
+		Unit: SS
+		Count: 1
+	HelixNode@ql3:
+		Id: ql3
+		Side: Quality
+		Tier: 3
+		Major: true
+		Name: Missile Submarine
+		Description: MAJOR: 1 submarine becomes a missile submarine.
+		Cost: 1100
+		Duration: 1200
+		Effect: Replace
+		Unit: MSUB
+		From: SS
+		Count: 1
+	HelixNode@qn3:
+		Id: qn3
+		Side: Quantity
+		Tier: 3
+		Major: true
+		Name: Missile Section
+		Description: MAJOR: adds a missile submarine.
+		Cost: 1100
+		Duration: 1200
+		Effect: AddUnit
+		Unit: MSUB
+		Count: 1
+	HelixNode@ql4:
+		Id: ql4
+		Side: Quality
+		Tier: 4
+		Name: Auto Loaders
+		Description: Squad fires 10% faster.
+		Cost: 650
+		Duration: 900
+		Effect: FireRate
+		Value: 10
+	HelixNode@qn4:
+		Id: qn4
+		Side: Quantity
+		Tier: 4
+		Name: Reinforce Elites
+		Description: Adds 1 more of your newest special ship.
+		Cost: 650
+		Duration: 900
+		Effect: AddElite
+		Count: 1
+	HelixNode@ql5:
+		Id: ql5
+		Side: Quality
+		Tier: 5
+		Name: Heavy Warheads
+		Description: Squad deals 15% more damage.
+		Cost: 800
+		Duration: 1075
+		Effect: Damage
+		Value: 15
+	HelixNode@qn5:
+		Id: qn5
+		Side: Quantity
+		Tier: 5
+		Name: Third Submarine
+		Description: Adds another submarine.
+		Cost: 800
+		Duration: 1075
+		Effect: AddUnit
+		Unit: SS
+		Count: 1
+	HelixNode@ql6:
+		Id: ql6
+		Side: Quality
+		Tier: 6
+		Major: true
+		Name: Missile Wolfpack
+		Description: MAJOR: another submarine becomes a missile submarine.
+		Cost: 1800
+		Duration: 1650
+		Effect: Replace
+		Unit: MSUB
+		From: SS
+		Count: 1
+	HelixNode@qn6:
+		Id: qn6
+		Side: Quantity
+		Tier: 6
+		Major: true
+		Name: Missile Flotilla
+		Description: MAJOR: adds 2 missile submarines.
+		Cost: 1800
+		Duration: 1650
+		Effect: AddUnit
+		Unit: MSUB
+		Count: 2
+
+PROC:
 	Exit@1:
 		SpawnOffset: 0,0,0
 		ExitCell: 1,2
 		Facing: 256
+	Production:
+		Produces: AutoHarv
 	AutoSquad:
 		ProductionType: AutoHarv
 		SpawnInterval: 500
 		InitialDelay: 375
+		AffectsAllHarvesters: true
 		Roster:
 			HARV: 1
+	HelixNode@ql1:
+		Id: ql1
+		Side: Quality
+		Tier: 1
+		Name: Tuned Engines
+		Description: Every harvester you own drives 3% faster.
+		Cost: 250
+		Duration: 450
+		Effect: Speed
+		Value: 3
+	HelixNode@qn1:
+		Id: qn1
+		Side: Quantity
+		Tier: 1
+		Name: Extra Silo
+		Description: Your resource storage grows by 500.
+		Cost: 250
+		Duration: 450
+		Effect: Storage
+		Value: 500
+	HelixNode@ql2:
+		Id: ql2
+		Side: Quality
+		Tier: 2
+		Name: Armor Plating
+		Description: Every harvester takes 4% less damage.
+		Cost: 300
+		Duration: 600
+		Effect: Armor
+		Value: 4
+	HelixNode@qn2:
+		Id: qn2
+		Side: Quantity
+		Tier: 2
+		Name: Second Shift
+		Description: A refinery crew builds one more harvester for free.
+		Cost: 300
+		Duration: 600
+		Effect: AddUnit
+		Unit: HARV
+		Count: 1
+	HelixNode@ql3:
+		Id: ql3
+		Side: Quality
+		Tier: 3
+		Major: true
+		Name: Reinforced Hulls
+		Description: MAJOR: harvesters take 5% less damage (12% in total with the other armor upgrades).
+		Cost: 700
+		Duration: 1000
+		Effect: Armor
+		Value: 5
+	HelixNode@qn3:
+		Id: qn3
+		Side: Quantity
+		Tier: 3
+		Major: true
+		Name: Silo Complex
+		Description: MAJOR: your resource storage grows by 1000.
+		Cost: 700
+		Duration: 1000
+		Effect: Storage
+		Value: 1000
+	HelixNode@ql4:
+		Id: ql4
+		Side: Quality
+		Tier: 4
+		Name: Efficient Gearing
+		Description: Harvesters drive 3% faster.
+		Cost: 450
+		Duration: 750
+		Effect: Speed
+		Value: 3
+	HelixNode@qn4:
+		Id: qn4
+		Side: Quantity
+		Tier: 4
+		Name: Extra Silo II
+		Description: Your resource storage grows by 500.
+		Cost: 450
+		Duration: 750
+		Effect: Storage
+		Value: 500
+	HelixNode@ql5:
+		Id: ql5
+		Side: Quality
+		Tier: 5
+		Name: Hardened Plating
+		Description: Harvesters take 3% less damage.
+		Cost: 500
+		Duration: 900
+		Effect: Armor
+		Value: 3
+	HelixNode@qn5:
+		Id: qn5
+		Side: Quantity
+		Tier: 5
+		Name: Third Shift
+		Description: One more free harvester.
+		Cost: 500
+		Duration: 900
+		Effect: AddUnit
+		Unit: HARV
+		Count: 1
+	HelixNode@ql6:
+		Id: ql6
+		Side: Quality
+		Tier: 6
+		Major: true
+		Name: Racing Tune
+		Description: MAJOR: harvesters drive 4% faster (10% faster in total).
+		Cost: 1200
+		Duration: 1375
+		Effect: Speed
+		Value: 4
+	HelixNode@qn6:
+		Id: qn6
+		Side: Quantity
+		Tier: 6
+		Major: true
+		Name: Grand Storage Depot
+		Description: MAJOR: your resource storage grows by 1000.
+		Cost: 1200
+		Duration: 1375
+		Effect: Storage
+		Value: 1000
+
+FACT:
+	AutoSquad:
+		SpawnInterval: 100
+		InitialDelay: 100
+	Power@afp1:
+		Amount: 15
+		RequiresCondition: afp1
+	Power@afp2:
+		Amount: 15
+		RequiresCondition: afp2
+	Power@afp3:
+		Amount: 30
+		RequiresCondition: afp3
+	Power@afp4:
+		Amount: 20
+		RequiresCondition: afp4
+	Power@afp5:
+		Amount: 20
+		RequiresCondition: afp5
+	Power@afp6:
+		Amount: 40
+		RequiresCondition: afp6
+	ProvidesPrerequisite@afb1:
+		Prerequisite: afb1
+		RequiresCondition: afb1
+	ProvidesPrerequisite@afb2:
+		Prerequisite: afb2
+		RequiresCondition: afb2
+	ProvidesPrerequisite@afb3:
+		Prerequisite: afb3
+		RequiresCondition: afb3
+	ProvidesPrerequisite@afb4:
+		Prerequisite: afb4
+		RequiresCondition: afb4
+	ProvidesPrerequisite@afb5:
+		Prerequisite: afb5
+		RequiresCondition: afb5
+	ProvidesPrerequisite@afb6:
+		Prerequisite: afb6
+		RequiresCondition: afb6
+	HelixNode@ql1:
+		Id: ql1
+		Side: Quality
+		Tier: 1
+		Name: Prefab Panels
+		Description: Buildings and defenses are constructed 4% faster.
+		Cost: 250
+		Duration: 450
+		Effect: Condition
+		Condition: afb1
+	HelixNode@qn1:
+		Id: qn1
+		Side: Quantity
+		Tier: 1
+		Name: Auxiliary Generator
+		Description: The Construction Yard itself generates 15 power.
+		Cost: 250
+		Duration: 450
+		Effect: Condition
+		Condition: afp1
+	HelixNode@ql2:
+		Id: ql2
+		Side: Quality
+		Tier: 2
+		Name: Crane Teams
+		Description: Buildings and defenses are constructed another 4% faster.
+		Cost: 300
+		Duration: 600
+		Effect: Condition
+		Condition: afb2
+	HelixNode@qn2:
+		Id: qn2
+		Side: Quantity
+		Tier: 2
+		Name: Generator Tuning
+		Description: The Construction Yard generates 15 more power.
+		Cost: 300
+		Duration: 600
+		Effect: Condition
+		Condition: afp2
+	HelixNode@ql3:
+		Id: ql3
+		Side: Quality
+		Tier: 3
+		Major: true
+		Name: Assembly Line
+		Description: MAJOR: construction is another 6% faster.
+		Cost: 700
+		Duration: 1000
+		Effect: Condition
+		Condition: afb3
+	HelixNode@qn3:
+		Id: qn3
+		Side: Quantity
+		Tier: 3
+		Major: true
+		Name: Reactor Core
+		Description: MAJOR: the Construction Yard generates 30 more power.
+		Cost: 700
+		Duration: 1000
+		Effect: Condition
+		Condition: afp3
+	HelixNode@ql4:
+		Id: ql4
+		Side: Quality
+		Tier: 4
+		Name: Better Logistics
+		Description: Construction is another 3% faster.
+		Cost: 450
+		Duration: 750
+		Effect: Condition
+		Condition: afb4
+	HelixNode@qn4:
+		Id: qn4
+		Side: Quantity
+		Tier: 4
+		Name: Coolant Loop
+		Description: The Construction Yard generates 20 more power.
+		Cost: 450
+		Duration: 750
+		Effect: Condition
+		Condition: afp4
+	HelixNode@ql5:
+		Id: ql5
+		Side: Quality
+		Tier: 5
+		Name: Night Shifts
+		Description: Construction is another 3% faster.
+		Cost: 500
+		Duration: 900
+		Effect: Condition
+		Condition: afb5
+	HelixNode@qn5:
+		Id: qn5
+		Side: Quantity
+		Tier: 5
+		Name: Power Bus
+		Description: The Construction Yard generates 20 more power.
+		Cost: 500
+		Duration: 900
+		Effect: Condition
+		Condition: afp5
+	HelixNode@ql6:
+		Id: ql6
+		Side: Quality
+		Tier: 6
+		Major: true
+		Name: Modular Construction
+		Description: MAJOR: construction is another 6% faster (about 24% in total).
+		Cost: 1200
+		Duration: 1375
+		Effect: Condition
+		Condition: afb6
+	HelixNode@qn6:
+		Id: qn6
+		Side: Quantity
+		Tier: 6
+		Major: true
+		Name: Fusion Cell
+		Description: MAJOR: the Construction Yard generates 40 more power (140 in total).
+		Cost: 1200
+		Duration: 1375
+		Effect: Condition
+		Condition: afp6
+
+FIX:
+	Production:
+		Produces: AutoMcv
+	Exit@1:
+		ProductionTypes: AutoMcv
+		ExitCell: 0,2
+	Exit@2:
+		ProductionTypes: AutoMcv
+		ExitCell: 2,2
+	OnDemandBuild:
+		Unit: MCV
+		ProductionType: AutoMcv
+		Duration: 3000
+		PayCost: true
 
 AFINF:
 	Inherits: TENT
@@ -59,6 +1002,10 @@ AFINF:
 		ProductionTypes: AutoInf
 	Exit@2:
 		ProductionTypes: AutoInf
+	ProvidesPrerequisite@tent:
+		Prerequisite: tent
+	ProvidesPrerequisite@barr:
+		Prerequisite: barr
 	AutoSquad:
 		ProductionType: AutoInf
 		SpawnInterval: 150
@@ -289,6 +1236,10 @@ AFAT:
 		ProductionTypes: AutoInf
 	Exit@2:
 		ProductionTypes: AutoInf
+	ProvidesPrerequisite@tent:
+		Prerequisite: tent
+	ProvidesPrerequisite@barr:
+		Prerequisite: barr
 	AutoSquad:
 		ProductionType: AutoInf
 		SpawnInterval: 170
@@ -521,6 +1472,10 @@ AFDEMO:
 		ProductionTypes: AutoInf
 	Exit@2:
 		ProductionTypes: AutoInf
+	ProvidesPrerequisite@tent:
+		Prerequisite: tent
+	ProvidesPrerequisite@barr:
+		Prerequisite: barr
 	AutoSquad:
 		ProductionType: AutoInf
 		SpawnInterval: 170

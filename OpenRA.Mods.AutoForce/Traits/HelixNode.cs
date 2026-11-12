@@ -23,6 +23,10 @@ namespace OpenRA.Mods.AutoForce.Traits
 		AddUnit, // Add Count of Unit to the squad.
 		AddElite, // Add Count of the most recently unlocked elite unit (or the first roster unit).
 		Replace, // Swap Count of From for Count of To (To becomes the new elite unit).
+
+		Armor, // Value% less damage taken by the building's units.
+		Storage, // Value extra resource storage for the owner while this building stands.
+		Condition, // Grants the named Condition on the building (rules enable traits with it).
 	}
 
 	[Desc("One node of a building's helix upgrade tree. Add one of these traits per node. " +
@@ -64,6 +68,9 @@ namespace OpenRA.Mods.AutoForce.Traits
 
 		[Desc("Actor to be replaced (Replace only).")]
 		public readonly string From = null;
+
+		[Desc("Condition granted by the Condition effect.")]
+		public readonly string Condition = null;
 
 		[Desc("Number of units added or replaced.")]
 		public readonly int Count = 1;

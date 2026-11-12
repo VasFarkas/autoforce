@@ -27,10 +27,27 @@ This repo contains a GitHub Actions workflow (`.github/workflows/build.yml`) tha
 * A building keeps its squad at strength: when a unit dies it trains a replacement, one unit per interval, at the building's rally point.
 * **Units are free.** The limit is the squad size: a building only trains until its squad is full, then replaces losses. Set `PayForUnits: true` on `AutoSquad` to charge normal unit prices instead.
 * The original Barracks / War Factory are no longer buildable. The classic sidebar queues for infantry and vehicles stay empty.
+* The new barracks and factories also count as a "tent" / "barracks" / "war factory" for tech purposes, so pillboxes, flame towers, turrets and the rest of the defenses stay buildable.
+
+## Air, naval, refinery, yard and depot
+
+These are the normal Red Alert buildings, upgraded in place (select one and its panel opens):
+
+| Building | What it does |
+|---|---|
+| Helipad (`HPAD`) | keeps 2 Longbows; trees add Chinooks / Hind gunships. Needs a free pad, status line says so |
+| Airfield (`AFLD`) | keeps 2 Yaks; trees convert / add MiGs |
+| Naval Yard (`SYRD`) | destroyer + 2 gunboats; trees add destroyers / cruisers |
+| Sub Pen (`SPEN`) | 2 submarines; trees add missile subs |
+| Service Depot (`FIX`) | repairs as before, and a **Build MCV** button in its panel: 2 minute build, normal MCV price ($2000) paid when you press it |
+| Ore Refinery (`PROC`) | 6-tier tree. Quality: harvester speed (+10% in total) and armor (-12% damage in total). Quantity: storage (+3000 in total) and up to 2 extra free harvesters |
+| Construction Yard (`FACT`) | 6-tier tree. Quality: buildings and defenses about 24% faster to construct. Quantity: up to +140 power from the yard itself |
+
+Harvester "unloading speed" is not an upgrade: the engine fixes it per harvester type, so it cannot change at runtime.
 
 ## The helix menu
 
-Select a building: the helix panel opens in the right-hand sidebar, in place of the build palette (the "< Build" button at its top flips back to the normal palette while the building stays selected). Left strand = **quantity**, right strand = **quality**. 9 tiers, a **major** node on tiers 3, 6 and 9.
+Select a building: the helix panel opens in the right-hand sidebar, just right of the build tabs, so the tabs (buildings / defenses ...) stay clickable. Clicking a tab, or the "< Build" button at the panel's top, flips back to the normal palette while the building stays selected. Left strand = **quantity**, right strand = **quality**. 9 tiers (6 for the refinery, yard and air / naval buildings), a **major** node on tiers 3, 6 and 9.
 
 * **Pick one node per tier.** The other node on that tier locks.
 * You stay on your strand, and may **cross to the other strand only right after a major**.
@@ -52,4 +69,4 @@ Each building carries a coloured text badge in the world (INF green, AT red, DEM
 
 ## If a building does not train units
 
-Select it and look at the bottom of the sidebar panel. The status line says what it is doing ("Next: Rifle Infantry in 4s", "Squad is at full strength") or what is blocking it in red ("no free exit...", "production is disabled...", "unknown actor ..."). The small text at the top of the panel shows the build number (currently `AutoForce build 3`); if you do not see it, the old DLL is still being used. The same messages are written to OpenRA's `debug.log` (Windows: `%APPDATA%\OpenRA\Logs\`).
+Select it and look at the bottom of the sidebar panel. The status line says what it is doing ("Next: Rifle Infantry in 4s", "Squad is at full strength") or what is blocking it in red ("no free exit...", "production is disabled...", "unknown actor ..."). The small text at the top of the panel shows the build number (currently `AutoForce build 4`); if you do not see it, the old DLL is still being used. The same messages are written to OpenRA's `debug.log` (Windows: `%APPDATA%\OpenRA\Logs\`).

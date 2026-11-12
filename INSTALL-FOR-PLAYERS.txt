@@ -20,8 +20,10 @@ UPDATING: if you already installed an older version, replace BOTH the DLL and th
      It should end up like:   "C:\...\OpenRA\RedAlert.exe" Game.Mod=autoforce
    - Click OK, rename the shortcut to "AutoForce", and double-click it to play.
 5. Play Skirmish with no AI, or a multiplayer game. Build a power plant, then one of the new barracks/factories.
-   Click it and the helix upgrade menu replaces the build palette in the right-hand sidebar.
-   The "< Build" button at the top of it switches back to the normal build palette.
+   Click it and the helix upgrade menu opens in the right-hand sidebar, next to the build tabs.
+   Click a tab (or the "< Build" button at the top of the menu) to see the normal build palette again.
+   The Helipad, Airfield, Naval Yard, Sub Pen, Ore Refinery and Construction Yard have upgrade menus too,
+   and the Service Depot has a "Build MCV" button.
 
 Everyone in a multiplayer game needs the same files.
 The Linux AppImage and macOS app cannot be modified this way.
