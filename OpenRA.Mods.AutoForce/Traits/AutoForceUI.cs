@@ -24,7 +24,12 @@ namespace OpenRA.Mods.AutoForce.Traits
 				return;
 
 			// The in-game UI is (re)built while the world loads, so add ours once that has finished.
-			Game.RunAfterTick(() => Ui.Root.AddChild(new HelixTreeWidget(w, wr)));
+			Game.RunAfterTick(() =>
+			{
+				HelixTreeWidget.Pinned = null;
+				Ui.Root.AddChild(new HelixTreeWidget(w, wr));
+				Ui.Root.AddChild(new HelixButtonsWidget(w));
+			});
 		}
 	}
 }

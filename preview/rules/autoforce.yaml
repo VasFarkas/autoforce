@@ -41,6 +41,159 @@ World:
 		Prerequisites: afb6
 		Queue: Building, Defense
 
+Player:
+	BaseBuilderBotModule@rush:
+		BarracksTypes: barr,tent,afinf,afat,afdemo
+		VehiclesFactoryTypes: weap,afmain
+		ProductionTypes: barr,tent,weap,afinf,afat,afdemo,afmain,afutil,afsiege
+		BuildingLimits:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 1
+			afutil: 1
+			afsiege: 1
+		BuildingFractions:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 1
+			afutil: 1
+			afsiege: 1
+	BaseBuilderBotModule@normal:
+		BarracksTypes: barr,tent,afinf,afat,afdemo
+		VehiclesFactoryTypes: weap,afmain
+		ProductionTypes: barr,tent,weap,afld,hpad,afinf,afat,afdemo,afmain,afutil,afsiege
+		BuildingLimits:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 2
+			afutil: 1
+			afsiege: 1
+		BuildingFractions:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 6
+			afutil: 1
+			afsiege: 1
+	BaseBuilderBotModule@turtle:
+		BarracksTypes: barr,tent,afinf,afat,afdemo
+		VehiclesFactoryTypes: weap,afmain
+		ProductionTypes: barr,tent,weap,afld,hpad,afinf,afat,afdemo,afmain,afutil,afsiege
+		BuildingLimits:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 2
+			afutil: 1
+			afsiege: 1
+		BuildingFractions:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 3
+			afutil: 1
+			afsiege: 1
+	BaseBuilderBotModule@naval:
+		BarracksTypes: barr,tent,afinf,afat,afdemo
+		VehiclesFactoryTypes: weap,afmain
+		ProductionTypes: barr,tent,weap,afld,hpad,afinf,afat,afdemo,afmain,afutil,afsiege
+		BuildingLimits:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 1
+			afutil: 1
+			afsiege: 1
+		BuildingFractions:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 1
+			afutil: 1
+			afsiege: 1
+	HelixResearchBotModule:
+		RequiresCondition: enable-rush-ai || enable-normal-ai || enable-turtle-ai || enable-naval-ai
+
+Player:
+	BaseBuilderBotModule@rush:
+		BarracksTypes: barr,tent,afinf,afat,afdemo
+		VehiclesFactoryTypes: weap,afmain
+		ProductionTypes: barr,tent,weap,afinf,afat,afdemo,afmain,afutil,afsiege
+		BuildingLimits:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 1
+			afutil: 1
+			afsiege: 1
+		BuildingFractions:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 1
+			afutil: 1
+			afsiege: 1
+	BaseBuilderBotModule@normal:
+		BarracksTypes: barr,tent,afinf,afat,afdemo
+		VehiclesFactoryTypes: weap,afmain
+		ProductionTypes: barr,tent,weap,afld,hpad,afinf,afat,afdemo,afmain,afutil,afsiege
+		BuildingLimits:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 2
+			afutil: 1
+			afsiege: 1
+		BuildingFractions:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 6
+			afutil: 1
+			afsiege: 1
+	BaseBuilderBotModule@turtle:
+		BarracksTypes: barr,tent,afinf,afat,afdemo
+		VehiclesFactoryTypes: weap,afmain
+		ProductionTypes: barr,tent,weap,afld,hpad,afinf,afat,afdemo,afmain,afutil,afsiege
+		BuildingLimits:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 2
+			afutil: 1
+			afsiege: 1
+		BuildingFractions:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 3
+			afutil: 1
+			afsiege: 1
+	BaseBuilderBotModule@naval:
+		BarracksTypes: barr,tent,afinf,afat,afdemo
+		VehiclesFactoryTypes: weap,afmain
+		ProductionTypes: barr,tent,weap,afld,hpad,afinf,afat,afdemo,afmain,afutil,afsiege
+		BuildingLimits:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 1
+			afutil: 1
+			afsiege: 1
+		BuildingFractions:
+			afinf: 1
+			afat: 1
+			afdemo: 1
+			afmain: 1
+			afutil: 1
+			afsiege: 1
+	HelixResearchBotModule:
+		RequiresCondition: enable-rush-ai || enable-normal-ai || enable-turtle-ai || enable-naval-ai
+
+
 TENT:
 	Buildable:
 		Prerequisites: ~disabled

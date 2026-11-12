@@ -51,6 +51,10 @@ namespace OpenRA.Mods.AutoForce.Widgets
 		readonly World world;
 		AutoSquad squad;
 		Actor squadActor;
+		/// <summary>Building opened by one of the helix buttons; takes priority over the selection.</summary>
+		public static Actor Pinned;
+		public static bool ClearSuppression;
+
 		Actor suppressedActor;
 		OnDemandBuild demand;
 		Actor lastFound;
@@ -99,6 +103,25 @@ namespace OpenRA.Mods.AutoForce.Widgets
 				}
 			}
 
+			if (ClearSuppression)
+			{
+				ClearSuppression = false;
+				suppressedActor = null;
+				lastFound = null; // re-read the palette queue when the panel opens
+			}
+
+			if (Pinned != null && (Pinned.IsDead || !Pinned.IsInWorld || Pinned.Owner != world.LocalPlayer))
+				Pinned = null;
+
+			if (Pinned != null)
+			{
+				found = Pinned;
+				foundSquad = Pinned.TraitOrDefault<AutoSquad>();
+				foundDemand = foundSquad != null && foundSquad.HasTree ? null : Pinned.TraitOrDefault<OnDemandBuild>();
+				if (foundSquad != null && !foundSquad.HasTree)
+					foundSquad = null;
+			}
+
 			// "Build" button: stay on the normal palette until the selection changes.
 			if (suppressedActor != null && found != suppressedActor)
 				suppressedActor = null;
@@ -115,7 +138,10 @@ namespace OpenRA.Mods.AutoForce.Widgets
 				queueWhenOpened = queueNow;
 			}
 			else if (found != null && found != suppressedActor && queueNow != queueWhenOpened)
+			{
 				suppressedActor = found;
+				Pinned = null;
+			}
 
 			if (found != null && found == suppressedActor)
 			{
@@ -211,7 +237,10 @@ namespace OpenRA.Mods.AutoForce.Widgets
 				if (mi.Event == MouseInputEvent.Down && mi.Button == MouseButton.Left)
 				{
 					if (BuildButtonRect().Contains(mi.Location))
+					{
 						suppressedActor = squadActor;
+						Pinned = null;
+					}
 					else if (DemandButtonRect().Contains(mi.Location) && !demand.Building)
 						world.IssueOrder(new Order(OnDemandBuild.BuildOrder, squadActor, false));
 				}
@@ -227,6 +256,7 @@ namespace OpenRA.Mods.AutoForce.Widgets
 				if (BuildButtonRect().Contains(mi.Location))
 				{
 					suppressedActor = squadActor;
+					Pinned = null;
 					return true;
 				}
 

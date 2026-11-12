@@ -325,6 +325,39 @@ for _b in INPLACE:
         _b["conditional"] = [c for c in YARD_CONDITIONALS if c[1] == "power"] + [c for c in YARD_CONDITIONALS if c[1] == "time"]
 
 
+
+# ----------------------------------------------------------------------------
+# Skirmish AI support: the bots build the AutoForce buildings instead of barracks / war factory and
+# research upgrades through AutoForceBotModule.
+# ----------------------------------------------------------------------------
+
+AI_TYPES = ("rush", "normal", "turtle", "naval")
+AI_SQUAD_SIZE = {"rush": 8, "normal": 12, "turtle": 14}
+AI_BUILDINGS = {  # actor -> fraction weight, limit (per AI flavour: default, overrides)
+    "afinf": (4, 1), "afat": (3, 1), "afdemo": (2, 1), "afmain": (6, 2), "afutil": (2, 1), "afsiege": (2, 1),
+}
+
+
+def ai_yaml():
+    L = ["Player:"]
+    for t in AI_TYPES:
+        L += ["\tBaseBuilderBotModule@%s:" % t,
+              "\t\tBarracksTypes: afinf, afat, afdemo",
+              "\t\tVehiclesFactoryTypes: afmain, afutil, afsiege",
+              "\t\tProductionTypes: afinf, afat, afdemo, afmain, afutil, afsiege",
+              "\t\tBuildingLimits:"]
+        for a, (_w, lim) in AI_BUILDINGS.items():
+            L.append("\t\t\t%s: %d" % (a, lim if t != "naval" or a not in ("afinf", "afat", "afdemo") else 1))
+        L.append("\t\tBuildingFractions:")
+        for a, (w, _l) in AI_BUILDINGS.items():
+            L.append("\t\t\t%s: %d" % (a, w))
+    for t, size in AI_SQUAD_SIZE.items():
+        L += ["\tSquadManagerBotModule@%s:" % t, "\t\tSquadSize: %d" % size]
+    L += ["\tAutoForceBotModule:",
+          "\t\tRequiresCondition: enable-rush-ai || enable-normal-ai || enable-turtle-ai || enable-naval-ai"]
+    return L
+
+
 # Badge text and colour drawn on each building in the world, plus (optionally) a different existing
 # structure icon for the build sidebar: actor -> (badge, colour, (icon sequence, icon file, image that hosts it)).
 BADGES = {'AFINF': ('INF', '5CD65C', None), 'AFAT': ('AT', 'E8604C', None), 'AFDEMO': ('DEMO', 'F0A030', ('icon-demo', 'kennicon.shp', 'tent')), 'AFMAIN': ('MAIN', '5AA0F0', None), 'AFUTIL': ('UTIL', '4CD6D6', ('icon-util', 'fixicon.shp', 'weap')), 'AFSIEGE': ('SIEGE', 'C070E0', ('icon-siege', 'stekicon.shp', 'weap'))}
@@ -491,6 +524,37 @@ def inplace_yaml(b):
     return L
 
 
+AI_NEW = ["afinf", "afat", "afdemo", "afmain", "afutil", "afsiege"]
+AI_BOTS = {
+    "rush": dict(base="barr,tent,weap", extra="", fractions=dict(afinf=1, afat=1, afdemo=1, afmain=1, afutil=1, afsiege=1),
+                 limits=dict(afinf=1, afat=1, afdemo=1, afmain=1, afutil=1, afsiege=1)),
+    "normal": dict(base="barr,tent,weap,afld,hpad", extra="", fractions=dict(afinf=1, afat=1, afdemo=1, afmain=6, afutil=1, afsiege=1),
+                   limits=dict(afinf=1, afat=1, afdemo=1, afmain=2, afutil=1, afsiege=1)),
+    "turtle": dict(base="barr,tent,weap,afld,hpad", extra="", fractions=dict(afinf=1, afat=1, afdemo=1, afmain=3, afutil=1, afsiege=1),
+                   limits=dict(afinf=1, afat=1, afdemo=1, afmain=2, afutil=1, afsiege=1)),
+    "naval": dict(base="barr,tent,weap,afld,hpad", extra="", fractions=dict(afinf=1, afat=1, afdemo=1, afmain=1, afutil=1, afsiege=1),
+                  limits=dict(afinf=1, afat=1, afdemo=1, afmain=1, afutil=1, afsiege=1)),
+}
+
+
+def ai_yaml():
+    # The skirmish AI builds the AF barracks/factories instead of the (disabled) classic ones. Units come out of
+    # those buildings by themselves, and HelixResearchBotModule buys their upgrades.
+    L = ["Player:"]
+    for bot, d in AI_BOTS.items():
+        L.append("\tBaseBuilderBotModule@%s:" % bot)
+        L.append("\t\tBarracksTypes: barr,tent,afinf,afat,afdemo")
+        L.append("\t\tVehiclesFactoryTypes: weap,afmain")
+        L.append("\t\tProductionTypes: %s,%s" % (d["base"], ",".join(AI_NEW)))
+        L.append("\t\tBuildingLimits:")
+        L += ["\t\t\t%s: %d" % kv for kv in d["limits"].items()]
+        L.append("\t\tBuildingFractions:")
+        L += ["\t\t\t%s: %d" % kv for kv in d["fractions"].items()]
+    L += ["\tHelixResearchBotModule:",
+          "\t\tRequiresCondition: enable-rush-ai || enable-normal-ai || enable-turtle-ai || enable-naval-ai", ""]
+    return L
+
+
 def yard_global_yaml():
     # Every placed building / defense reads the construction-speed prerequisites the Construction Yard grants.
     L = ["^BasicBuilding:"]
@@ -510,6 +574,9 @@ def rules_yaml():
           "^Plane:", "\tSquadMember:", "",
           "World:", "\tAutoForceUI:", ""]
     L += yard_global_yaml()
+    L += ai_yaml()
+    L += ai_yaml()
+    L.append("")
     # The classic buildings are replaced by the auto-training variants.
     for old in ("TENT", "BARR", "WEAP"):
         L += ["%s:" % old, "\tBuildable:", "\t\tPrerequisites: ~disabled", ""]

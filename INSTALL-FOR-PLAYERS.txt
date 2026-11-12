@@ -21,6 +21,7 @@ UPDATING: if you already installed an older version, replace BOTH the DLL and th
    - Click OK, rename the shortcut to "AutoForce", and double-click it to play.
 5. Play Skirmish with no AI, or a multiplayer game. Build a power plant, then one of the new barracks/factories.
    Click it and the helix upgrade menu opens in the right-hand sidebar, next to the build tabs.
+   A column of buttons left of the sidebar opens each building type's menu (greyed out if you own none).
    Click a tab (or the "< Build" button at the top of the menu) to see the normal build palette again.
    The Helipad, Airfield, Naval Yard, Sub Pen, Ore Refinery and Construction Yard have upgrade menus too,
    and the Service Depot has a "Build MCV" button.

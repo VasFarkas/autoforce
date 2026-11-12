@@ -45,6 +45,10 @@ These are the normal Red Alert buildings, upgraded in place (select one and its 
 
 Harvester "unloading speed" is not an upgrade: the engine fixes it per harvester type, so it cannot change at runtime.
 
+## The tree buttons
+
+A column of buttons (INF, AT, DEMO, MAIN, UTIL, SIEGE, HELIPAD, AIRFIELD, NAVAL, SUB PEN, REFINERY, YARD, DEPOT) sits just left of the sidebar. A button is greyed out while you own no building of that type; otherwise click it to open that building's upgrade tree (click again to cycle if you own several, "x2" shows the count). Selecting a building still opens its tree too.
+
 ## The helix menu
 
 Select a building: the helix panel opens in the right-hand sidebar, just right of the build tabs, so the tabs (buildings / defenses ...) stay clickable. Clicking a tab, or the "< Build" button at the panel's top, flips back to the normal palette while the building stays selected. Left strand = **quantity**, right strand = **quality**. 9 tiers (6 for the refinery, yard and air / naval buildings), a **major** node on tiers 3, 6 and 9.
@@ -61,7 +65,9 @@ Edit the numbers, names and trees in `tools/generate.py`, then run `python3 inst
 
 This was written without a .NET compiler available, so **it has never been compiled or run**. What was done instead: every engine API it uses was checked against the OpenRA 20250330 source, and `tools/check.py` cross-checks the generated YAML against the C# fields, RA's parent actors, fluent strings and weapons. If the build reports an error, it will be small (a missing `using`, a renamed member). Please send me the compiler output.
 
-Known limits: skirmish AI cannot use these buildings; the factories and barracks reuse Red Alert art (same look as the originals, told apart by name and menu); sniper / machine gunner / tank hunter reuse the rifleman and rocket soldier sprites; balance numbers are first guesses.
+Skirmish AI: the bots build the new barracks and factories in place of the classic ones, their units come out automatically and join attack squads, and a bot module (`HelixResearchBotModule`) buys upgrades with spare cash. A bot never rebuilds a lost MCV (nothing can make one for it) and does not buy the Depot MCV.
+
+Known limits: the factories and barracks reuse Red Alert art (same look as the originals, told apart by name and menu); sniper / machine gunner / tank hunter reuse the rifleman and rocket soldier sprites; balance numbers are first guesses.
 
 ## Telling the buildings apart
 
@@ -69,4 +75,4 @@ Each building carries a coloured text badge in the world (INF green, AT red, DEM
 
 ## If a building does not train units
 
-Select it and look at the bottom of the sidebar panel. The status line says what it is doing ("Next: Rifle Infantry in 4s", "Squad is at full strength") or what is blocking it in red ("no free exit...", "production is disabled...", "unknown actor ..."). The small text at the top of the panel shows the build number (currently `AutoForce build 4`); if you do not see it, the old DLL is still being used. The same messages are written to OpenRA's `debug.log` (Windows: `%APPDATA%\OpenRA\Logs\`).
+Select it and look at the bottom of the sidebar panel. The status line says what it is doing ("Next: Rifle Infantry in 4s", "Squad is at full strength") or what is blocking it in red ("no free exit...", "production is disabled...", "unknown actor ..."). The small text at the top of the panel shows the build number (currently `AutoForce build 6`); if you do not see it, the old DLL is still being used. The same messages are written to OpenRA's `debug.log` (Windows: `%APPDATA%\OpenRA\Logs\`).
