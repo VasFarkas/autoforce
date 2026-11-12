@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenRA.Graphics;
 using OpenRA.Mods.AutoForce.Traits;
+using OpenRA.Mods.Common.Widgets;
 using OpenRA.Primitives;
 using OpenRA.Widgets;
 

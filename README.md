@@ -75,4 +75,4 @@ Each building carries a coloured text badge in the world (INF green, AT red, DEM
 
 ## If a building does not train units
 
-Select it and look at the bottom of the sidebar panel. The status line says what it is doing ("Next: Rifle Infantry in 4s", "Squad is at full strength") or what is blocking it in red ("no free exit...", "production is disabled...", "unknown actor ..."). The small text at the top of the panel shows the build number (currently `AutoForce build 6`); if you do not see it, the old DLL is still being used. The same messages are written to OpenRA's `debug.log` (Windows: `%APPDATA%\OpenRA\Logs\`).
+Select it and look at the bottom of the sidebar panel. The status line says what it is doing ("Next: Rifle Infantry in 4s", "Squad is at full strength") or what is blocking it in red ("no free exit...", "production is disabled...", "unknown actor ..."). The small text at the top of the panel shows the build number (currently `AutoForce build 7`); if you do not see it, the old DLL is still being used. The same messages are written to OpenRA's `debug.log` (Windows: `%APPDATA%\OpenRA\Logs\`).

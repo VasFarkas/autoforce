@@ -53,7 +53,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 	public class AutoSquad : ITick, IResolveOrder, INotifyProduction, INotifyOwnerChanged, INotifyActorDisposing, INotifyKilled
 	{
 		public const string ResearchOrder = "AutoForceResearch";
-		public const string BuildStamp = "AutoForce build 6";
+		public const string BuildStamp = "AutoForce build 7";
 
 		public readonly AutoSquadInfo Info;
 		public readonly List<HelixNodeInfo> Nodes;
