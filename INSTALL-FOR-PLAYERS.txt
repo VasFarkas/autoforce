@@ -1,0 +1,27 @@
+AutoForce for OpenRA (Red Alert) - player install, no tools needed
+
+You need the normal OpenRA Red Alert, version "release 20250330", installed on Windows,
+and Red Alert's content already downloaded (just play the normal game once).
+
+1. Find your OpenRA install folder, the one that contains "RedAlert.exe" and a folder called "mods"
+   (right-click the Red Alert Start menu shortcut -> "Open file location" if you are unsure; you may need to
+   right-click that shortcut again and choose "Open file location" a second time to reach the real folder).
+UPDATING: if you already installed an older version, replace BOTH the DLL and the mods\autoforce folder.
+
+2. Copy the file   OpenRA.Mods.AutoForce.dll   from this download into that folder, next to RedAlert.exe.
+3. Copy the folder   mods\autoforce   from this download into the "mods" folder inside that same install folder
+   (so you end up with ...\mods\ra and ...\mods\autoforce side by side).
+   Windows may ask for administrator permission - allow it.
+4. Make a start shortcut for the mod (OpenRA has no mod-switch menu, each mod is started on its own):
+   - In that same install folder, right-click RedAlert.exe -> "Show more options" -> "Create shortcut"
+     (or "Send to" -> "Desktop (create shortcut)").
+   - Right-click the new shortcut -> Properties. In the "Target" box, click at the very end and add a space,
+     then:   Game.Mod=autoforce
+     It should end up like:   "C:\...\OpenRA\RedAlert.exe" Game.Mod=autoforce
+   - Click OK, rename the shortcut to "AutoForce", and double-click it to play.
+5. Play Skirmish with no AI, or a multiplayer game. Build a power plant, then one of the new barracks/factories.
+   Click it and the helix upgrade menu replaces the build palette in the right-hand sidebar.
+   The "< Build" button at the top of it switches back to the normal build palette.
+
+Everyone in a multiplayer game needs the same files.
+The Linux AppImage and macOS app cannot be modified this way.

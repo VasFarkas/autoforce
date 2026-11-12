@@ -1,0 +1,26 @@
+SniperRifle:
+	Inherits: ^LightMG
+	ReloadDelay: 70
+	Range: 9c0
+	Report: gun11.aud
+	Warhead@1Dam: SpreadDamage
+		Damage: 6000
+		Versus:
+			None: 150
+			Wood: 5
+			Light: 10
+			Heavy: 5
+			Concrete: 2
+
+MGunBurst:
+	Inherits: M60mg
+	Range: 5c0
+	ReloadDelay: 24
+	Burst: 6
+
+HuntDragon:
+	Inherits: Dragon
+	ReloadDelay: 40
+	Range: 5c768
+	Warhead@1Dam: SpreadDamage
+		Damage: 7000
