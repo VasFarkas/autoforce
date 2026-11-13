@@ -45,9 +45,32 @@ These are the normal Red Alert buildings, upgraded in place (select one and its 
 
 Harvester "unloading speed" is not an upgrade: the engine fixes it per harvester type, so it cannot change at runtime.
 
-## The tree buttons
+## The tree buttons and panel (bottom right)
 
-A column of buttons (INF, AT, DEMO, MAIN, UTIL, SIEGE, HELIPAD, AIRFIELD, NAVAL, SUB PEN, REFINERY, YARD, DEPOT) sits just left of the sidebar. A button is greyed out while you own no building of that type; otherwise click it to open that building's upgrade tree (click again to cycle if you own several, "x2" shows the count). Selecting a building still opens its tree too.
+A 3x3 grid of buttons (INFANTRY, FACTORY, HELIPAD, AIRFIELD, NAVAL, SUB PEN, REFINERY, YARD, DEPOT) sits in the bottom right corner of the screen, and the research panel opens directly above it, to the right of the build tabs. A button is greyed out while you own no building of that type; otherwise click it to open that tree (click again to cycle through your buildings of that type, "x2" shows the count). Selecting a building still opens its tree too.
+
+## Two factions: Allies and Soviets
+
+The country variants (England, France, Germany, Russia, Ukraine) are gone; you pick **Allies**, **Soviets** or Random. Buildings train only their own side's units:
+
+| Building | Allies | Soviets |
+|---|---|---|
+| Infantry Barracks | rifle infantry, medics, snipers, machine gunners, rockets, Tanya | rifle infantry, grenadiers, snipers, machine gunners, shock troopers, engineers |
+| Anti-Armor Barracks | rocket soldiers, tank hunters, medics, engineers | rocket soldiers, tank hunters, engineers |
+| Demolition Barracks | rifle, rocket, engineer, mechanics, spies, Tanya | flamers, grenadiers, attack dogs, shock troopers |
+| Main Factory | medium and Patton (new Allied heavy) tanks, light tanks, chrono tanks | heavy, Mammoth, tesla tanks, flak trucks |
+| Utility Factory | scout vehicles, phase transports, radar jammer, gap generator, minelayers | armored transports, flak trucks, demolition truck, tesla, minelayers |
+| Siege Factory | artillery, Patton and chrono tanks | V2 launchers, MAD and Mammoth tanks |
+
+Same tree, same costs and times for both sides: only the unit each node gives differs. Maps that force a removed country as a player's faction will not load; normal skirmish maps use Random.
+
+## Universal infantry and factory trees
+
+The Infantry, Anti-Armor and Demolition Barracks share ONE infantry tree, and the Main, Utility and Siege Factories share ONE factory tree. Each node is researched once (one at a time for the whole tree):
+
+* Speed / damage / fire-rate nodes apply to the squads of every building in the tree.
+* Unit nodes (more units, swaps, majors) make every building in the tree add or swap its OWN units, e.g. the "Elite Training" major gives the Infantry Barracks snipers, the Anti-Armor Barracks tank hunters and the Demolition Barracks shock troopers. Hover a node to see what the building you are looking at gets.
+* A barracks or factory built later automatically gets everything already researched.
 
 ## The helix menu
 
@@ -75,4 +98,4 @@ Each building carries a coloured text badge in the world (INF green, AT red, DEM
 
 ## If a building does not train units
 
-Select it and look at the bottom of the sidebar panel. The status line says what it is doing ("Next: Rifle Infantry in 4s", "Squad is at full strength") or what is blocking it in red ("no free exit...", "production is disabled...", "unknown actor ..."). The small text at the top of the panel shows the build number (currently `AutoForce build 7`); if you do not see it, the old DLL is still being used. The same messages are written to OpenRA's `debug.log` (Windows: `%APPDATA%\OpenRA\Logs\`).
+Select it and look at the bottom of the sidebar panel. The status line says what it is doing ("Next: Rifle Infantry in 4s", "Squad is at full strength") or what is blocking it in red ("no free exit...", "production is disabled...", "unknown actor ..."). The small text at the top of the panel shows the build number (currently `AutoForce build 8`); if you do not see it, the old DLL is still being used. The same messages are written to OpenRA's `debug.log` (Windows: `%APPDATA%\OpenRA\Logs\`).

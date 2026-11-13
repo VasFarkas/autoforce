@@ -23,20 +23,29 @@ namespace OpenRA.Mods.AutoForce.Widgets
 	/// </summary>
 	public class HelixButtonsWidget : Widget
 	{
-		const int ButtonWidth = 62;
-		const int ButtonHeight = 22;
+		const int Columns = 3;
+		const int ButtonWidth = 64;
+		const int ButtonHeight = 20;
 		const int Gap = 3;
-		const int SidebarWidth = 250;
-		const int Top = 300;
+		const int SidebarRightMargin = 210; // same left edge as the research panel
+		const int BottomMargin = 8;
 
-		static readonly (string Actor, string Label, int Rgb)[] Entries =
+		static readonly (string[] Actors, string Label, int Rgb)[] Entries =
 		{
-			("AFINF", "INF", 0x5CD65C), ("AFAT", "AT", 0xE8604C), ("AFDEMO", "DEMO", 0xF0A030),
-			("AFMAIN", "MAIN", 0x5AA0F0), ("AFUTIL", "UTIL", 0x4CD6D6), ("AFSIEGE", "SIEGE", 0xC070E0),
-			("HPAD", "HELIPAD", 0xE0E0E0), ("AFLD", "AIRFIELD", 0xE0E0E0), ("SYRD", "NAVAL", 0x70B8F0),
-			("SPEN", "SUB PEN", 0x70B8F0), ("PROC", "REFINERY", 0xE8C050), ("FACT", "YARD", 0xE8C050),
-			("FIX", "DEPOT", 0xA0D080),
+			(new[] { "AFINF", "AFAT", "AFDEMO" }, "INFANTRY", 0x5CD65C),
+			(new[] { "AFMAIN", "AFUTIL", "AFSIEGE" }, "FACTORY", 0x5AA0F0),
+			(new[] { "HPAD" }, "HELIPAD", 0xE0E0E0),
+			(new[] { "AFLD" }, "AIRFIELD", 0xE0E0E0),
+			(new[] { "SYRD" }, "NAVAL", 0x70B8F0),
+			(new[] { "SPEN" }, "SUB PEN", 0x70B8F0),
+			(new[] { "PROC" }, "REFINERY", 0xE8C050),
+			(new[] { "FACT" }, "YARD", 0xE8C050),
+			(new[] { "FIX" }, "DEPOT", 0xA0D080),
 		};
+
+		static int Rows { get { return (Entries.Length + Columns - 1) / Columns; } }
+
+		static int GridHeight { get { return Rows * ButtonHeight + (Rows - 1) * Gap; } }
 
 		readonly World world;
 		readonly List<Actor>[] owned = new List<Actor>[Entries.Length];
@@ -49,13 +58,13 @@ namespace OpenRA.Mods.AutoForce.Widgets
 				owned[i] = new List<Actor>();
 
 			IsVisible = () => true;
-			Bounds = new WidgetBounds(0, 0, ButtonWidth, Entries.Length * (ButtonHeight + Gap));
+			Bounds = new WidgetBounds(0, 0, Columns * ButtonWidth + (Columns - 1) * Gap, GridHeight);
 		}
 
 		public override void Tick()
 		{
 			var screen = Game.Renderer.Resolution;
-			Bounds = new WidgetBounds(screen.Width - SidebarWidth - ButtonWidth - 4, Top, ButtonWidth, Entries.Length * (ButtonHeight + Gap));
+			Bounds = new WidgetBounds(screen.Width - SidebarRightMargin, screen.Height - BottomMargin - GridHeight, Columns * ButtonWidth + (Columns - 1) * Gap, GridHeight);
 
 			foreach (var l in owned)
 				l.Clear();
@@ -79,7 +88,7 @@ namespace OpenRA.Mods.AutoForce.Widgets
 			var name = a.Info.Name.ToUpperInvariant();
 			for (var i = 0; i < Entries.Length; i++)
 			{
-				if (Entries[i].Actor != name || owned[i].Contains(a))
+				if (Array.IndexOf(Entries[i].Actors, name) < 0 || owned[i].Contains(a))
 					continue;
 
 				var s = a.TraitOrDefault<AutoSquad>();
@@ -93,7 +102,7 @@ namespace OpenRA.Mods.AutoForce.Widgets
 		Rectangle Rect(int i)
 		{
 			var o = RenderOrigin;
-			return new Rectangle(o.X, o.Y + i * (ButtonHeight + Gap), ButtonWidth, ButtonHeight);
+			return new Rectangle(o.X + (i % Columns) * (ButtonWidth + Gap), o.Y + (i / Columns) * (ButtonHeight + Gap), ButtonWidth, ButtonHeight);
 		}
 
 		int IndexAt(int2 p)
@@ -140,10 +149,13 @@ namespace OpenRA.Mods.AutoForce.Widgets
 				WidgetUtils.FillRectWithColor(r, border);
 				WidgetUtils.FillRectWithColor(new Rectangle(r.X + 1, r.Y + 1, r.Width - 2, r.Height - 2), bg);
 
-				var label = count > 1 ? Entries[i].Label + " x" + count : Entries[i].Label;
 				var font = Game.Renderer.Fonts["TinyBold"];
+				var label = Entries[i].Label;
+				if (count > 1 && font.Measure(label + " x" + count).X <= ButtonWidth - 4)
+					label += " x" + count;
+
 				var w = font.Measure(label).X;
-				font.DrawTextWithShadow(label, new float2(r.X + (r.Width - w) / 2, r.Y + 6), text, Color.Black, 1);
+				font.DrawTextWithShadow(label, new float2(r.X + (r.Width - w) / 2, r.Y + 5), text, Color.Black, 1);
 			}
 		}
 	}

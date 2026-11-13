@@ -25,6 +25,9 @@ namespace OpenRA.Mods.AutoForce.Traits
 		[Desc("Squad at the start: actor name -> number of units to maintain.")]
 		public readonly Dictionary<string, int> Roster = new Dictionary<string, int>();
 
+		[Desc("Squad at the start for Soviet players. Empty = same as Roster.")]
+		public readonly Dictionary<string, int> SovietRoster = new Dictionary<string, int>();
+
 		[Desc("Production type used to choose an Exit (must match an Exit's ProductionTypes, or the Exit must have none).")]
 		public readonly string ProductionType = "AutoInfantry";
 
@@ -47,13 +50,17 @@ namespace OpenRA.Mods.AutoForce.Traits
 		[Desc("Title shown on top of the helix panel. Empty = use the actor's tooltip.")]
 		public readonly string PanelTitle = "";
 
+		[Desc("Buildings with the same tree group share one research state: a node is bought once and every building " +
+			"of the group applies its own version of it. Empty = this building has a private tree.")]
+		public readonly string TreeGroup = "";
+
 		public override object Create(ActorInitializer init) { return new AutoSquad(init.Self, this); }
 	}
 
 	public class AutoSquad : ITick, IResolveOrder, INotifyProduction, INotifyOwnerChanged, INotifyActorDisposing, INotifyKilled
 	{
 		public const string ResearchOrder = "AutoForceResearch";
-		public const string BuildStamp = "AutoForce build 7";
+		public const string BuildStamp = "AutoForce build 8";
 
 		public readonly AutoSquadInfo Info;
 		public readonly List<HelixNodeInfo> Nodes;
@@ -62,8 +69,8 @@ namespace OpenRA.Mods.AutoForce.Traits
 		readonly List<string> unitOrder = new List<string>();
 		readonly Dictionary<string, int> target = new Dictionary<string, int>();
 		readonly List<Actor> members = new List<Actor>();
-		readonly HashSet<string> done = new HashSet<string>();
-		readonly Dictionary<int, string> chosenByTier = new Dictionary<int, string>();
+		HelixGroupState state;
+		int appliedCount;
 
 		Production production;
 		string lastElite;
@@ -79,9 +86,28 @@ namespace OpenRA.Mods.AutoForce.Traits
 
 		string lastLogged;
 
-		public HelixNodeInfo Researching { get; private set; }
-		public int ResearchTicksLeft { get; private set; }
-		public int ResearchTicksTotal { get; private set; }
+		HelixGroupState State
+		{
+			get
+			{
+				if (state == null)
+					state = self.Owner.PlayerActor.Trait<HelixTrees>().Get(Info.TreeGroup, self);
+
+				return state;
+			}
+		}
+
+		public HelixNodeInfo Researching
+		{
+			get
+			{
+				var id = State.ResearchingId;
+				return id == null ? null : Nodes.FirstOrDefault(n => n.Id == id);
+			}
+		}
+
+		public int ResearchTicksLeft { get { return State.TicksLeft; } }
+		public int ResearchTicksTotal { get { return State.TicksTotal; } }
 
 		public AutoSquad(Actor self, AutoSquadInfo info)
 		{
@@ -91,7 +117,9 @@ namespace OpenRA.Mods.AutoForce.Traits
 
 			// Actor names are lowercase inside the ruleset (Actors["e1"], ActorInfo.Name == "e1"),
 			// while YAML spells them E1, so everything is normalized here.
-			foreach (var kv in info.Roster)
+			var soviet = IsSoviet(self.Owner);
+			var roster = soviet && info.SovietRoster.Count > 0 ? info.SovietRoster : info.Roster;
+			foreach (var kv in roster)
 			{
 				var name = kv.Key.ToLowerInvariant();
 				unitOrder.Add(name);
@@ -101,7 +129,17 @@ namespace OpenRA.Mods.AutoForce.Traits
 			foreach (var kv in info.ProductionTypeOverrides)
 				typeOverrides[kv.Key.ToLowerInvariant()] = kv.Value;
 
-			Nodes = self.Info.TraitInfos<HelixNodeInfo>().OrderBy(n => n.Tier).ThenBy(n => n.Side).ToList();
+			var sideName = soviet ? "Soviet" : "Allies";
+			Nodes = self.Info.TraitInfos<HelixNodeInfo>()
+				.Where(n => string.IsNullOrEmpty(n.Faction) || string.Equals(n.Faction, sideName, StringComparison.OrdinalIgnoreCase))
+				.OrderBy(n => n.Tier).ThenBy(n => n.Side).ToList();
+		}
+
+		static bool IsSoviet(Player p)
+		{
+			var f = p.Faction;
+			return f != null && (string.Equals(f.Side, "Soviet", StringComparison.OrdinalIgnoreCase) ||
+				string.Equals(f.InternalName, "soviet", StringComparison.OrdinalIgnoreCase));
 		}
 
 		public bool HasTree { get { return Nodes.Count > 0; } }
@@ -160,14 +198,14 @@ namespace OpenRA.Mods.AutoForce.Traits
 
 		public NodeState GetState(HelixNodeInfo n)
 		{
-			if (done.Contains(n.Id))
+			if (State.Done.Contains(n.Id))
 				return NodeState.Done;
 
-			if (Researching != null && Researching.Id == n.Id)
+			if (State.ResearchingId == n.Id)
 				return NodeState.Researching;
 
 			string chosen;
-			if (chosenByTier.TryGetValue(n.Tier, out chosen) && chosen != n.Id)
+			if (State.ChosenByTier.TryGetValue(n.Tier, out chosen) && chosen != n.Id)
 				return NodeState.Excluded;
 
 			return PrerequisitesMet(n) ? NodeState.Available : NodeState.Locked;
@@ -179,7 +217,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 				return true;
 
 			string prevId;
-			if (!chosenByTier.TryGetValue(n.Tier - 1, out prevId) || !done.Contains(prevId))
+			if (!State.ChosenByTier.TryGetValue(n.Tier - 1, out prevId) || !State.Done.Contains(prevId))
 				return false;
 
 			var prev = Nodes.FirstOrDefault(x => x.Id == prevId);
@@ -196,7 +234,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 				return "";
 
 			string prevId;
-			if (!chosenByTier.TryGetValue(n.Tier - 1, out prevId) || !done.Contains(prevId))
+			if (!State.ChosenByTier.TryGetValue(n.Tier - 1, out prevId) || !State.Done.Contains(prevId))
 				return "Finish tier " + (n.Tier - 1) + " first";
 
 			return "Switching strands needs a major upgrade first";
@@ -210,7 +248,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 
 		void StartResearch(string id)
 		{
-			if (Researching != null)
+			if (State.ResearchingId != null)
 				return;
 
 			var node = Nodes.FirstOrDefault(n => n.Id == id);
@@ -221,18 +259,11 @@ namespace OpenRA.Mods.AutoForce.Traits
 			if (!resources.TakeCash(node.Cost, true))
 				return;
 
-			Researching = node;
-			ResearchTicksTotal = Math.Max(1, node.Duration);
-			ResearchTicksLeft = ResearchTicksTotal;
-			chosenByTier[node.Tier] = node.Id;
+			State.Start(node.Id, node.Tier, node.Name, Math.Max(1, node.Duration));
 		}
 
-		void FinishResearch()
+		void ApplyNode(HelixNodeInfo node)
 		{
-			var node = Researching;
-			Researching = null;
-			done.Add(node.Id);
-
 			switch (node.Effect)
 			{
 				case HelixEffect.Speed:
@@ -275,9 +306,6 @@ namespace OpenRA.Mods.AutoForce.Traits
 					break;
 			}
 
-			RefreshBonuses();
-			Game.Sound.PlayNotification(self.World.Map.Rules, self.Owner, "Speech", "NewOptions", self.Owner.Faction.InternalName);
-			TextNotificationsManager.AddTransientLine(self.Owner, node.Name + " complete.");
 		}
 
 		void AddWanted(string unit, int count)
@@ -401,8 +429,22 @@ namespace OpenRA.Mods.AutoForce.Traits
 
 		void ITick.Tick(Actor self)
 		{
-			if (Researching != null && --ResearchTicksLeft <= 0)
-				FinishResearch();
+			// Apply every node the (possibly shared) tree has finished since this building last looked,
+			// in the order they were bought, using this building's own version of each node.
+			var applied = false;
+			while (appliedCount < State.DoneOrder.Count)
+			{
+				var id = State.DoneOrder[appliedCount++];
+				var node = Nodes.FirstOrDefault(n => n.Id == id);
+				if (node != null)
+				{
+					ApplyNode(node);
+					applied = true;
+				}
+			}
+
+			if (applied)
+				RefreshBonuses();
 
 			members.RemoveAll(m => m.IsDead || m.Owner != self.Owner);
 

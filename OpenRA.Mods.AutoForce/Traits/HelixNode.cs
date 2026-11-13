@@ -69,6 +69,9 @@ namespace OpenRA.Mods.AutoForce.Traits
 		[Desc("Actor to be replaced (Replace only).")]
 		public readonly string From = null;
 
+		[Desc("Only available to this side (Allies or Soviet). Empty = both sides.")]
+		public readonly string Faction = "";
+
 		[Desc("Condition granted by the Condition effect.")]
 		public readonly string Condition = null;
 

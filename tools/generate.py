@@ -202,6 +202,179 @@ BUILDINGS = [
 ]
 
 
+
+# ----------------------------------------------------------------------------
+# Universal trees. The three barracks share ONE infantry tree and the three factories share ONE factory tree:
+# a node is researched once; stat nodes apply to every building of the group, unit nodes make each building
+# add / swap its OWN units. Node ids, tiers, costs and times are identical, only the unit effect differs.
+# Every unit effect can differ per side, so Allied players only get Allied units and Soviet players Soviet ones.
+# ----------------------------------------------------------------------------
+
+UNIT_NAMES = {
+    "E1": "Rifle Infantry", "E2": "Grenadiers", "E3": "Rocket Soldiers", "E4": "Flamethrowers", "E6": "Engineers",
+    "MEDI": "Medics", "MGUN": "Machine Gunners", "SNPR": "Snipers", "HUNT": "Tank Hunters", "SHOK": "Shock Troopers",
+    "E7": "Commandos", "DOG": "Attack Dogs", "SPY": "Spies", "MECH": "Mechanics",
+    "1TNK": "Light Tanks", "2TNK": "Medium Tanks", "3TNK": "Heavy Tanks", "4TNK": "Mammoth Tanks", "JEEP": "Scout Vehicles",
+    "APC": "Armored Transports", "STNK": "Phase Transports", "CTNK": "Chrono Tanks", "TTNK": "Tesla Tanks",
+    "MNLY": "Minelayers", "MGG": "Gap Generators", "MRJ": "Radar Jammers", "ARTY": "Artillery", "V2RL": "V2 Launchers",
+    "QTNK": "MAD Tanks", "PTNK": "Patton Tanks", "FTRK": "Flak Trucks", "DTRK": "Demolition Trucks",
+}
+SINGULAR = {"E1": "Rifle Infantry", "MEDI": "Medic", "ARTY": "Artillery", "DOG": "Attack Dog", "E7": "Commando"}
+
+
+def U(code, n=1):
+    if n != 1:
+        return UNIT_NAMES[code]
+    return SINGULAR.get(code) or UNIT_NAMES[code].rstrip("s")
+
+
+def _unit_node(spec, name, major):
+    pre = "MAJOR: " if major else ""
+    if spec[0] == "A":
+        _, unit, count = spec
+        return A(unit, count, name, "%sThis building adds %d %s." % (pre, count, U(unit, count)))
+    _, frm, to, count = spec
+    return P(frm, to, count, name, "%sThis building turns %d %s into %s." % (pre, count, U(frm, count), U(to, count)))
+
+
+def _stat_node(kind, name, v, noun):
+    if kind == "S":
+        return S(name, "All %s move %d%% faster." % (noun, v), v)
+    if kind == "D":
+        return D(name, "All %s deal %d%% more damage." % (noun, v), v)
+    return R(name, "All %s fire %d%% faster." % (noun, v), v)
+
+
+def _build_universal(group, noun, defs, ids):
+    for actor in ids:
+        b = next(x for x in BUILDINGS if x["actor"] == actor)
+        b["group"] = group
+        for side, key in (("quality", "ql"), ("quantity", "qn")):
+            for fac, suffix in (("A", ""), ("S", "_s")):
+                out = []
+                for i, e in enumerate(defs[side]):
+                    major = (i + 1) in MAJOR_TIERS
+                    if e[0] in ("S", "D", "R"):
+                        out.append(_stat_node(e[0], e[1], e[2], noun))
+                    elif e[0] == "E":
+                        out.append(E(e[2], e[1], "Adds %d more of this building's newest special unit." % e[2]))
+                    else:
+                        spec = e[2][actor]
+                        if isinstance(spec, dict):
+                            spec = spec[fac]
+                        out.append(_unit_node(spec, e[1], major))
+                b[side + suffix] = out
+
+
+def _both(spec):
+    return spec
+
+
+_build_universal("infantry", "infantry squads", dict(
+    quality=[
+        ("S", "Forced March", 10), ("D", "Hardened Rounds", 10),
+        ("U", "Elite Training", {
+            "AFINF": ("P", "E1", "SNPR", 2), "AFAT": ("P", "E3", "HUNT", 3),
+            "AFDEMO": {"A": ("P", "E1", "SPY", 2), "S": ("P", "E4", "SHOK", 2)}}),
+        ("R", "Drilled Reloads", 10), ("S", "Light Kit", 10),
+        ("U", "Veteran Specialists", {
+            "AFINF": {"A": ("P", "E1", "SNPR", 2), "S": ("P", "E1", "SHOK", 2)}, "AFAT": ("P", "E1", "HUNT", 2),
+            "AFDEMO": {"A": ("P", "E1", "MGUN", 2), "S": ("P", "E2", "SHOK", 2)}}),
+        ("D", "Armor Piercing", 15), ("R", "Rapid Fire Doctrine", 15),
+        ("U", "Special Forces", {
+            "AFINF": {"A": ("P", "E1", "E7", 1), "S": ("P", "E1", "SHOK", 2)}, "AFAT": ("P", "E3", "HUNT", 3),
+            "AFDEMO": {"A": ("P", "E3", "E7", 1), "S": ("P", "E4", "SHOK", 2)}}),
+    ],
+    quantity=[
+        ("U", "Reinforcements I", {
+            "AFINF": {"A": ("A", "MEDI", 1), "S": ("A", "E2", 1)}, "AFAT": ("A", "E3", 1),
+            "AFDEMO": {"A": ("A", "E6", 1), "S": ("A", "E4", 1)}}),
+        ("U", "Reinforcements II", {
+            "AFINF": ("A", "E1", 2), "AFAT": ("A", "E3", 1),
+            "AFDEMO": {"A": ("A", "E3", 1), "S": ("A", "E2", 1)}}),
+        ("U", "Specialist Section", {
+            "AFINF": ("A", "MGUN", 3), "AFAT": ("A", "HUNT", 2),
+            "AFDEMO": {"A": ("A", "MECH", 2), "S": ("A", "DOG", 3)}}),
+        ("E", "Reinforce Elites", 2),
+        ("U", "Reinforcements III", {
+            "AFINF": ("A", "E1", 2), "AFAT": {"A": ("A", "MEDI", 1), "S": ("A", "E1", 1)},
+            "AFDEMO": {"A": ("A", "MEDI", 1), "S": ("A", "E4", 2)}}),
+        ("U", "Heavy Platoon", {
+            "AFINF": {"A": ("A", "E3", 3), "S": ("A", "E2", 3)}, "AFAT": ("A", "E3", 4),
+            "AFDEMO": {"A": ("A", "E3", 4), "S": ("A", "E4", 4)}}),
+        ("E", "Veteran Cadre", 2),
+        ("U", "Reinforcements IV", {
+            "AFINF": {"A": ("A", "MEDI", 1), "S": ("A", "E6", 1)}, "AFAT": ("A", "E6", 1),
+            "AFDEMO": {"A": ("A", "E6", 1), "S": ("A", "E2", 2)}}),
+        ("U", "Mass Levy", {
+            "AFINF": ("A", "E1", 6), "AFAT": ("A", "HUNT", 4),
+            "AFDEMO": {"A": ("A", "E3", 6), "S": ("A", "E2", 4)}}),
+    ]), ["AFINF", "AFAT", "AFDEMO"])
+
+_build_universal("factory", "factory squads", dict(
+    quality=[
+        ("D", "Depleted Shells", 10), ("S", "Tuned Engines", 10),
+        ("U", "Heavy Armor", {
+            "AFMAIN": {"A": ("P", "2TNK", "PTNK", 2), "S": ("P", "3TNK", "4TNK", 1)},
+            "AFUTIL": {"A": ("P", "JEEP", "STNK", 2), "S": ("P", "APC", "DTRK", 1)},
+            "AFSIEGE": {"A": ("P", "ARTY", "PTNK", 1), "S": ("P", "V2RL", "QTNK", 1)}}),
+        ("R", "Autoloaders", 10), ("D", "Reinforced Barrels", 10),
+        ("U", "Elite Hardware", {
+            "AFMAIN": {"A": ("P", "2TNK", "PTNK", 1), "S": ("P", "3TNK", "4TNK", 1)},
+            "AFUTIL": {"A": ("P", "JEEP", "MRJ", 1), "S": ("P", "FTRK", "TTNK", 1)},
+            "AFSIEGE": {"A": ("P", "ARTY", "PTNK", 1), "S": ("P", "V2RL", "QTNK", 1)}}),
+        ("S", "Overdrive", 10), ("R", "Rapid Cycling", 15),
+        ("U", "Super Heavy Doctrine", {
+            "AFMAIN": {"A": ("P", "PTNK", "CTNK", 1), "S": ("P", "3TNK", "TTNK", 1)},
+            "AFUTIL": {"A": ("P", "JEEP", "MGG", 1), "S": ("P", "APC", "TTNK", 1)},
+            "AFSIEGE": {"A": ("P", "ARTY", "CTNK", 1), "S": ("P", "V2RL", "4TNK", 1)}}),
+    ],
+    quantity=[
+        ("U", "Extra Chassis", {
+            "AFMAIN": {"A": ("A", "2TNK", 1), "S": ("A", "3TNK", 1)},
+            "AFUTIL": {"A": ("A", "JEEP", 1), "S": ("A", "APC", 1)},
+            "AFSIEGE": {"A": ("A", "ARTY", 1), "S": ("A", "V2RL", 1)}}),
+        ("U", "Second Line", {
+            "AFMAIN": {"A": ("A", "1TNK", 2), "S": ("A", "FTRK", 2)},
+            "AFUTIL": {"A": ("A", "JEEP", 1), "S": ("A", "FTRK", 1)},
+            "AFSIEGE": {"A": ("A", "ARTY", 1), "S": ("A", "V2RL", 1)}}),
+        ("U", "Motor Pool", {
+            "AFMAIN": {"A": ("A", "1TNK", 3), "S": ("A", "3TNK", 2)},
+            "AFUTIL": {"A": ("A", "JEEP", 3), "S": ("A", "APC", 3)},
+            "AFSIEGE": {"A": ("A", "ARTY", 2), "S": ("A", "V2RL", 2)}}),
+        ("E", "Reinforce Elites", 1),
+        ("U", "Support Vehicles", {
+            "AFMAIN": {"A": ("A", "2TNK", 1), "S": ("A", "3TNK", 1)},
+            "AFUTIL": ("A", "MNLY", 1),
+            "AFSIEGE": {"A": ("A", "2TNK", 1), "S": ("A", "3TNK", 1)}}),
+        ("U", "Armored Reserve", {
+            "AFMAIN": {"A": ("A", "PTNK", 2), "S": ("A", "4TNK", 1)},
+            "AFUTIL": {"A": ("A", "STNK", 2), "S": ("A", "FTRK", 3)},
+            "AFSIEGE": {"A": ("A", "ARTY", 2), "S": ("A", "V2RL", 2)}}),
+        ("E", "Veteran Cadre", 1),
+        ("U", "Specialists", {
+            "AFMAIN": {"A": ("A", "1TNK", 2), "S": ("A", "FTRK", 2)},
+            "AFUTIL": {"A": ("A", "MGG", 1), "S": ("A", "APC", 1)},
+            "AFSIEGE": {"A": ("A", "JEEP", 1), "S": ("A", "FTRK", 1)}}),
+        ("U", "Grand Army", {
+            "AFMAIN": {"A": ("A", "2TNK", 3), "S": ("A", "3TNK", 3)},
+            "AFUTIL": {"A": ("A", "JEEP", 4), "S": ("A", "APC", 4)},
+            "AFSIEGE": {"A": ("A", "ARTY", 3), "S": ("A", "V2RL", 3)}}),
+    ]), ["AFMAIN", "AFUTIL", "AFSIEGE"])
+
+# Start squads per side (Allies = "roster", Soviets = "roster_s" where it differs).
+for _b in BUILDINGS:
+    if _b["actor"] == "AFDEMO":
+        _b["roster"], _b["roster_s"] = [("E1", 4), ("E3", 2), ("E6", 2)], [("E4", 4), ("E2", 4)]
+    elif _b["actor"] == "AFMAIN":
+        _b["roster"], _b["roster_s"] = [("2TNK", 4)], [("3TNK", 3)]
+    elif _b["actor"] == "AFUTIL":
+        _b["roster"], _b["roster_s"] = [("JEEP", 3)], [("APC", 2), ("FTRK", 2)]
+    elif _b["actor"] == "AFSIEGE":
+        _b["roster"], _b["roster_s"] = [("ARTY", 4)], [("V2RL", 4)]
+    elif _b["actor"] == "AFINF":
+        _b["roster_s"] = []
+
 # ----------------------------------------------------------------------------
 # Upgrades for existing Red Alert buildings (no new actor: the building itself gets the trees).
 # Short 6-tier trees (majors at tiers 3 and 6).
@@ -369,6 +542,8 @@ CUSTOM_UNITS = [
       "\tArmament@PRIMARY:", "\t\tWeapon: SniperRifle"]),
     ("MGUN", "E1", 250, "Machine Gunner", "Sprays short bursts. Good against infantry.",
      ["\tArmament@PRIMARY:", "\t\tWeapon: MGunBurst"]),
+    ("PTNK", "2TNK", 1000, "Patton Tank", "Allied heavy tank: a medium tank chassis with thicker armor.",
+     ["\tHealth:", "\t\tHP: 70000"]),
     ("HUNT", "E3", 450, "Tank Hunter", "Rocket soldier with heavy anti-armor missiles.",
      ["\tArmament@SECONDARY:", "\t\tWeapon: HuntDragon"]),
 ]
@@ -409,7 +584,7 @@ MINOR_SECS = {1: 18, 2: 24, 4: 30, 5: 36, 7: 42, 8: 48}
 MAJOR_SECS = {3: 40, 6: 55, 9: 70}
 
 
-def node_yaml(b, side, idx, n):
+def node_yaml(b, side, idx, n, fac=None):
     tier = idx + 1
     major = tier in MAJOR_TIERS
     major = n["desc"].startswith("MAJOR")
@@ -421,10 +596,12 @@ def node_yaml(b, side, idx, n):
     cost = int(round(cost * scale / 50.0) * 50)
     secs = int(round(secs * b.get("timescale", 1.3 if b["vehicles"] else 1.0)))
     nid = ("ql" if side == "Quality" else "qn") + str(tier)
-    out = ["\tHelixNode@%s:" % nid,
+    out = ["\tHelixNode@%s%s:" % (nid, {"Allies": "a", "Soviet": "s"}.get(fac, "")),
            "\t\tId: %s" % nid,
            "\t\tSide: %s" % side,
            "\t\tTier: %d" % tier]
+    if fac:
+        out.append("\t\tFaction: %s" % fac)
     if major:
         out.append("\t\tMajor: true")
     out += ["\t\tName: %s" % n["name"],
@@ -475,10 +652,16 @@ def building_yaml(b):
     L += ["\tAutoSquad:",
           "\t\tProductionType: %s" % b["ptype"],
           "\t\tSpawnInterval: %d" % b["interval"],
-          "\t\tInitialDelay: %d" % (75 if not b["vehicles"] else 150),
-          "\t\tRoster:"]
+          "\t\tInitialDelay: %d" % (75 if not b["vehicles"] else 150)]
+    if b.get("group"):
+        L.append("\t\tTreeGroup: %s" % b["group"])
+    L.append("\t\tRoster:")
     for unit, count in b["roster"]:
         L.append("\t\t\t%s: %d" % (unit, count))
+    if b.get("roster_s"):
+        L.append("\t\tSovietRoster:")
+        for unit, count in b["roster_s"]:
+            L.append("\t\t\t%s: %d" % (unit, count))
     L += nodes_yaml(b)
     return L
 
@@ -486,8 +669,14 @@ def building_yaml(b):
 def nodes_yaml(b):
     L = []
     for idx in range(len(b["quality"])):
-        L += node_yaml(b, "Quality", idx, b["quality"][idx])
-        L += node_yaml(b, "Quantity", idx, b["quantity"][idx])
+        for side, key in (("Quality", "quality"), ("Quantity", "quantity")):
+            na = b[key][idx]
+            ns = b.get(key + "_s", b[key])[idx]
+            if na == ns:
+                L += node_yaml(b, side, idx, na)
+            else:
+                L += node_yaml(b, side, idx, na, "Allies")
+                L += node_yaml(b, side, idx, ns, "Soviet")
     return L
 
 
@@ -540,7 +729,7 @@ AI_BOTS = {
 def ai_yaml():
     # The skirmish AI builds the AF barracks/factories instead of the (disabled) classic ones. Units come out of
     # those buildings by themselves, and HelixResearchBotModule buys their upgrades.
-    L = ["Player:"]
+    L = ["Player:", "\tHelixTrees:"]
     for bot, d in AI_BOTS.items():
         L.append("\tBaseBuilderBotModule@%s:" % bot)
         L.append("\t\tBarracksTypes: barr,tent,afinf,afat,afdemo")
@@ -572,7 +761,16 @@ def rules_yaml():
           "^Vehicle:", "\tSquadMember:", "",
           "^Ship:", "\tSquadMember:", "",
           "^Plane:", "\tSquadMember:", "",
-          "World:", "\tAutoForceUI:", ""]
+          "World:", "\tAutoForceUI:"]
+    # Only two factions: the country variants are gone. Everything the old countries stood for is folded
+    # into plain Allies and Soviets (their units come from the buildings' own faction-specific trees).
+    for f in ("england", "france", "germany", "russia", "ukraine", "randomallies", "randomsoviet"):
+        L.append("\t-Faction@%s:" % f)
+    L += ["\tFaction@allies:", "\t\tName: autoforce-faction-allies.name", "\t\tDescription: autoforce-faction-allies.description",
+          "\t\tSelectable: True",
+          "\tFaction@soviet:", "\t\tName: autoforce-faction-soviet.name", "\t\tDescription: autoforce-faction-soviet.description",
+          "\t\tSelectable: True",
+          "\tFaction@random:", "\t\tRandomFactionMembers: allies, soviet", ""]
     L += yard_global_yaml()
     L += ai_yaml()
     L += ai_yaml()
@@ -619,7 +817,11 @@ def sequences_yaml():
 
 
 def fluent():
-    L = ["## AutoForce", ""]
+    L = ["## AutoForce", "",
+         "autoforce-faction-allies =", "    .name = Allies",
+         "    .description = The Allied army: rifle, sniper and Tanya infantry, medics and spies, light, medium and Patton tanks, artillery, chrono and phase tanks.", "",
+         "autoforce-faction-soviet =", "    .name = Soviets",
+         "    .description = The Soviet army: grenadiers, flamers, attack dogs and shock troopers, heavy and Mammoth tanks, V2 rockets, tesla and MAD tanks.", ""]
     for b in BUILDINGS:
         k = b["actor"].lower()
         L += ["actor-%s =" % k, "    .name = %s" % b["name"], "    .description = %s" % b["desc"], ""]
@@ -659,21 +861,32 @@ def ra_actor_names(root):
     return names
 
 
+ALLIED_ONLY = {"MEDI", "MECH", "SPY", "THF", "E7", "1TNK", "2TNK", "PTNK", "JEEP", "ARTY", "CTNK", "STNK", "MRJ", "MGG"}
+SOVIET_ONLY = {"E2", "E4", "SHOK", "DOG", "3TNK", "4TNK", "APC", "V2RL", "FTRK", "TTNK", "QTNK", "DTRK"}
+
+
 def validate(root):
     known = ra_actor_names(root) | {c[0] for c in CUSTOM_UNITS}
     problems = []
     for b in BUILDINGS:
         if b["parent"] not in known:
             problems.append("%s: parent %s unknown" % (b["actor"], b["parent"]))
-        used = [u for u, _ in b["roster"]]
+        used = [u for u, _ in b["roster"]] + [u for u, _ in b.get("roster_s", [])]
         for side in ("quality", "quantity"):
             if len(b[side]) != 9:
                 problems.append("%s %s has %d nodes" % (b["actor"], side, len(b[side])))
-            for n in b[side]:
+            for n in b[side] + b.get(side + "_s", []):
                 used += [n.get("unit"), n.get("frm")]
         for u in used:
             if u and u not in known:
                 problems.append("%s: unit %s is not an RA actor or custom unit" % (b["actor"], u))
+        # faction integrity: Allied lists may not hold Soviet-only units and the other way round
+        for who, forbidden, roster, nodes in (
+                ("Allies", SOVIET_ONLY, b["roster"], b["quality"] + b["quantity"]),
+                ("Soviet", ALLIED_ONLY, b.get("roster_s") or b["roster"], b.get("quality_s", b["quality"]) + b.get("quantity_s", b["quantity"]))):
+            for u in [x for x, _ in roster] + [v for n in nodes for v in (n.get("unit"), n.get("frm"))]:
+                if u in forbidden:
+                    problems.append("%s: %s list uses the other side's unit %s" % (b["actor"], who, u))
     for ip in INPLACE:
         used = [u for u, _ in ip["roster"]]
         if len(ip["quality"]) != len(ip["quantity"]):

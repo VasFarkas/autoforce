@@ -1,5 +1,13 @@
 ## AutoForce
 
+autoforce-faction-allies =
+    .name = Allies
+    .description = The Allied army: rifle, sniper and Tanya infantry, medics and spies, light, medium and Patton tanks, artillery, chrono and phase tanks.
+
+autoforce-faction-soviet =
+    .name = Soviets
+    .description = The Soviet army: grenadiers, flamers, attack dogs and shock troopers, heavy and Mammoth tanks, V2 rockets, tesla and MAD tanks.
+
 actor-afinf =
     .name = Infantry Barracks
     .description = Trains a rifle squad on its own and keeps it topped up. Open the helix menu to upgrade.
@@ -31,6 +39,10 @@ actor-snpr =
 actor-mgun =
     .name = Machine Gunner
     .description = Sprays short bursts. Good against infantry.
+
+actor-ptnk =
+    .name = Patton Tank
+    .description = Allied heavy tank: a medium tank chassis with thicker armor.
 
 actor-hunt =
     .name = Tank Hunter

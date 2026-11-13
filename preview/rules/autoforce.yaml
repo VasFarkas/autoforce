@@ -14,6 +14,23 @@
 
 World:
 	AutoForceUI:
+	-Faction@england:
+	-Faction@france:
+	-Faction@germany:
+	-Faction@russia:
+	-Faction@ukraine:
+	-Faction@randomallies:
+	-Faction@randomsoviet:
+	Faction@allies:
+		Name: autoforce-faction-allies.name
+		Description: autoforce-faction-allies.description
+		Selectable: True
+	Faction@soviet:
+		Name: autoforce-faction-soviet.name
+		Description: autoforce-faction-soviet.description
+		Selectable: True
+	Faction@random:
+		RandomFactionMembers: allies, soviet
 
 ^BasicBuilding:
 	ProductionTimeMultiplier@afb1:
@@ -42,6 +59,7 @@ World:
 		Queue: Building, Defense
 
 Player:
+	HelixTrees:
 	BaseBuilderBotModule@rush:
 		BarracksTypes: barr,tent,afinf,afat,afdemo
 		VehiclesFactoryTypes: weap,afmain
@@ -118,6 +136,7 @@ Player:
 		RequiresCondition: enable-rush-ai || enable-normal-ai || enable-turtle-ai || enable-naval-ai
 
 Player:
+	HelixTrees:
 	BaseBuilderBotModule@rush:
 		BarracksTypes: barr,tent,afinf,afat,afdemo
 		VehiclesFactoryTypes: weap,afmain
@@ -1163,6 +1182,7 @@ AFINF:
 		ProductionType: AutoInf
 		SpawnInterval: 150
 		InitialDelay: 75
+		TreeGroup: infantry
 		Roster:
 			E1: 8
 	HelixNode@ql1:
@@ -1170,28 +1190,41 @@ AFINF:
 		Side: Quality
 		Tier: 1
 		Name: Forced March
-		Description: Squad moves 10% faster.
+		Description: All infantry squads move 10% faster.
 		Cost: 300
 		Duration: 450
 		Effect: Speed
 		Value: 10
-	HelixNode@qn1:
+	HelixNode@qn1a:
 		Id: qn1
 		Side: Quantity
 		Tier: 1
-		Name: Field Medic
-		Description: Adds a medic to the squad.
+		Faction: Allies
+		Name: Reinforcements I
+		Description: This building adds 1 Medic.
 		Cost: 300
 		Duration: 450
 		Effect: AddUnit
 		Unit: MEDI
+		Count: 1
+	HelixNode@qn1s:
+		Id: qn1
+		Side: Quantity
+		Tier: 1
+		Faction: Soviet
+		Name: Reinforcements I
+		Description: This building adds 1 Grenadier.
+		Cost: 300
+		Duration: 450
+		Effect: AddUnit
+		Unit: E2
 		Count: 1
 	HelixNode@ql2:
 		Id: ql2
 		Side: Quality
 		Tier: 2
 		Name: Hardened Rounds
-		Description: Squad deals 10% more damage.
+		Description: All infantry squads deal 10% more damage.
 		Cost: 400
 		Duration: 600
 		Effect: Damage
@@ -1200,8 +1233,8 @@ AFINF:
 		Id: qn2
 		Side: Quantity
 		Tier: 2
-		Name: Conscripts
-		Description: Adds 2 riflemen.
+		Name: Reinforcements II
+		Description: This building adds 2 Rifle Infantry.
 		Cost: 400
 		Duration: 600
 		Effect: AddUnit
@@ -1212,8 +1245,8 @@ AFINF:
 		Side: Quality
 		Tier: 3
 		Major: true
-		Name: Marksman Team
-		Description: MAJOR: 2 riflemen become snipers (long range, kills infantry fast).
+		Name: Elite Training
+		Description: MAJOR: This building turns 2 Rifle Infantry into Snipers.
 		Cost: 900
 		Duration: 1000
 		Effect: Replace
@@ -1225,8 +1258,8 @@ AFINF:
 		Side: Quantity
 		Tier: 3
 		Major: true
-		Name: Machine Gun Section
-		Description: MAJOR: adds 3 machine gunners.
+		Name: Specialist Section
+		Description: MAJOR: This building adds 3 Machine Gunners.
 		Cost: 900
 		Duration: 1000
 		Effect: AddUnit
@@ -1237,7 +1270,7 @@ AFINF:
 		Side: Quality
 		Tier: 4
 		Name: Drilled Reloads
-		Description: Squad fires 10% faster.
+		Description: All infantry squads fire 10% faster.
 		Cost: 550
 		Duration: 750
 		Effect: FireRate
@@ -1247,7 +1280,7 @@ AFINF:
 		Side: Quantity
 		Tier: 4
 		Name: Reinforce Elites
-		Description: Adds 2 more of your newest special unit.
+		Description: Adds 2 more of this building's newest special unit.
 		Cost: 550
 		Duration: 750
 		Effect: AddElite
@@ -1257,7 +1290,7 @@ AFINF:
 		Side: Quality
 		Tier: 5
 		Name: Light Kit
-		Description: Squad moves 10% faster.
+		Description: All infantry squads move 10% faster.
 		Cost: 650
 		Duration: 900
 		Effect: Speed
@@ -1266,33 +1299,62 @@ AFINF:
 		Id: qn5
 		Side: Quantity
 		Tier: 5
-		Name: Second Wave
-		Description: Adds 2 riflemen.
+		Name: Reinforcements III
+		Description: This building adds 2 Rifle Infantry.
 		Cost: 650
 		Duration: 900
 		Effect: AddUnit
 		Unit: E1
 		Count: 2
-	HelixNode@ql6:
+	HelixNode@ql6a:
 		Id: ql6
 		Side: Quality
 		Tier: 6
+		Faction: Allies
 		Major: true
-		Name: Shock Detachment
-		Description: MAJOR: 2 riflemen become shock troopers.
+		Name: Veteran Specialists
+		Description: MAJOR: This building turns 2 Rifle Infantry into Snipers.
+		Cost: 1500
+		Duration: 1375
+		Effect: Replace
+		Unit: SNPR
+		From: E1
+		Count: 2
+	HelixNode@ql6s:
+		Id: ql6
+		Side: Quality
+		Tier: 6
+		Faction: Soviet
+		Major: true
+		Name: Veteran Specialists
+		Description: MAJOR: This building turns 2 Rifle Infantry into Shock Troopers.
 		Cost: 1500
 		Duration: 1375
 		Effect: Replace
 		Unit: SHOK
 		From: E1
 		Count: 2
-	HelixNode@qn6:
+	HelixNode@qn6a:
 		Id: qn6
 		Side: Quantity
 		Tier: 6
+		Faction: Allies
 		Major: true
-		Name: Grenadier Platoon
-		Description: MAJOR: adds 3 grenadiers.
+		Name: Heavy Platoon
+		Description: MAJOR: This building adds 3 Rocket Soldiers.
+		Cost: 1500
+		Duration: 1375
+		Effect: AddUnit
+		Unit: E3
+		Count: 3
+	HelixNode@qn6s:
+		Id: qn6
+		Side: Quantity
+		Tier: 6
+		Faction: Soviet
+		Major: true
+		Name: Heavy Platoon
+		Description: MAJOR: This building adds 3 Grenadiers.
 		Cost: 1500
 		Duration: 1375
 		Effect: AddUnit
@@ -1303,7 +1365,7 @@ AFINF:
 		Side: Quality
 		Tier: 7
 		Name: Armor Piercing
-		Description: Squad deals 15% more damage.
+		Description: All infantry squads deal 15% more damage.
 		Cost: 800
 		Duration: 1050
 		Effect: Damage
@@ -1313,7 +1375,7 @@ AFINF:
 		Side: Quantity
 		Tier: 7
 		Name: Veteran Cadre
-		Description: Adds 2 more of your newest special unit.
+		Description: Adds 2 more of this building's newest special unit.
 		Cost: 800
 		Duration: 1050
 		Effect: AddElite
@@ -1323,42 +1385,70 @@ AFINF:
 		Side: Quality
 		Tier: 8
 		Name: Rapid Fire Doctrine
-		Description: Squad fires 15% faster.
+		Description: All infantry squads fire 15% faster.
 		Cost: 900
 		Duration: 1200
 		Effect: FireRate
 		Value: 15
-	HelixNode@qn8:
+	HelixNode@qn8a:
 		Id: qn8
 		Side: Quantity
 		Tier: 8
-		Name: Second Medic
-		Description: Adds another medic.
+		Faction: Allies
+		Name: Reinforcements IV
+		Description: This building adds 1 Medic.
 		Cost: 900
 		Duration: 1200
 		Effect: AddUnit
 		Unit: MEDI
 		Count: 1
-	HelixNode@ql9:
+	HelixNode@qn8s:
+		Id: qn8
+		Side: Quantity
+		Tier: 8
+		Faction: Soviet
+		Name: Reinforcements IV
+		Description: This building adds 1 Engineer.
+		Cost: 900
+		Duration: 1200
+		Effect: AddUnit
+		Unit: E6
+		Count: 1
+	HelixNode@ql9a:
 		Id: ql9
 		Side: Quality
 		Tier: 9
+		Faction: Allies
 		Major: true
 		Name: Special Forces
-		Description: MAJOR: 1 rifleman becomes a commando.
+		Description: MAJOR: This building turns 1 Rifle Infantry into Commando.
 		Cost: 2200
 		Duration: 1750
 		Effect: Replace
 		Unit: E7
 		From: E1
 		Count: 1
+	HelixNode@ql9s:
+		Id: ql9
+		Side: Quality
+		Tier: 9
+		Faction: Soviet
+		Major: true
+		Name: Special Forces
+		Description: MAJOR: This building turns 2 Rifle Infantry into Shock Troopers.
+		Cost: 2200
+		Duration: 1750
+		Effect: Replace
+		Unit: SHOK
+		From: E1
+		Count: 2
 	HelixNode@qn9:
 		Id: qn9
 		Side: Quantity
 		Tier: 9
 		Major: true
 		Name: Mass Levy
-		Description: MAJOR: adds 6 riflemen.
+		Description: MAJOR: This building adds 6 Rifle Infantry.
 		Cost: 2200
 		Duration: 1750
 		Effect: AddUnit
@@ -1397,6 +1487,7 @@ AFAT:
 		ProductionType: AutoInf
 		SpawnInterval: 170
 		InitialDelay: 75
+		TreeGroup: infantry
 		Roster:
 			E3: 6
 			E1: 2
@@ -1404,18 +1495,18 @@ AFAT:
 		Id: ql1
 		Side: Quality
 		Tier: 1
-		Name: Shaped Charges
-		Description: Squad deals 10% more damage.
+		Name: Forced March
+		Description: All infantry squads move 10% faster.
 		Cost: 300
 		Duration: 450
-		Effect: Damage
+		Effect: Speed
 		Value: 10
 	HelixNode@qn1:
 		Id: qn1
 		Side: Quantity
 		Tier: 1
-		Name: Extra Launcher
-		Description: Adds a rocket soldier.
+		Name: Reinforcements I
+		Description: This building adds 1 Rocket Soldier.
 		Cost: 300
 		Duration: 450
 		Effect: AddUnit
@@ -1425,18 +1516,18 @@ AFAT:
 		Id: ql2
 		Side: Quality
 		Tier: 2
-		Name: Rapid Loaders
-		Description: Squad fires 10% faster.
+		Name: Hardened Rounds
+		Description: All infantry squads deal 10% more damage.
 		Cost: 400
 		Duration: 600
-		Effect: FireRate
+		Effect: Damage
 		Value: 10
 	HelixNode@qn2:
 		Id: qn2
 		Side: Quantity
 		Tier: 2
-		Name: Extra Launcher II
-		Description: Adds another rocket soldier.
+		Name: Reinforcements II
+		Description: This building adds 1 Rocket Soldier.
 		Cost: 400
 		Duration: 600
 		Effect: AddUnit
@@ -1447,8 +1538,8 @@ AFAT:
 		Side: Quality
 		Tier: 3
 		Major: true
-		Name: Tank Hunters
-		Description: MAJOR: 3 rocket soldiers become tank hunters (heavier missiles).
+		Name: Elite Training
+		Description: MAJOR: This building turns 3 Rocket Soldiers into Tank Hunters.
 		Cost: 900
 		Duration: 1000
 		Effect: Replace
@@ -1460,8 +1551,8 @@ AFAT:
 		Side: Quantity
 		Tier: 3
 		Major: true
-		Name: Heavy Rocket Section
-		Description: MAJOR: adds 2 tank hunters.
+		Name: Specialist Section
+		Description: MAJOR: This building adds 2 Tank Hunters.
 		Cost: 900
 		Duration: 1000
 		Effect: AddUnit
@@ -1471,18 +1562,18 @@ AFAT:
 		Id: ql4
 		Side: Quality
 		Tier: 4
-		Name: Light Packs
-		Description: Squad moves 10% faster.
+		Name: Drilled Reloads
+		Description: All infantry squads fire 10% faster.
 		Cost: 550
 		Duration: 750
-		Effect: Speed
+		Effect: FireRate
 		Value: 10
 	HelixNode@qn4:
 		Id: qn4
 		Side: Quantity
 		Tier: 4
 		Name: Reinforce Elites
-		Description: Adds 2 more of your newest special unit.
+		Description: Adds 2 more of this building's newest special unit.
 		Cost: 550
 		Duration: 750
 		Effect: AddElite
@@ -1491,30 +1582,43 @@ AFAT:
 		Id: ql5
 		Side: Quality
 		Tier: 5
-		Name: Tungsten Warheads
-		Description: Squad deals 15% more damage.
+		Name: Light Kit
+		Description: All infantry squads move 10% faster.
 		Cost: 650
 		Duration: 900
-		Effect: Damage
-		Value: 15
-	HelixNode@qn5:
+		Effect: Speed
+		Value: 10
+	HelixNode@qn5a:
 		Id: qn5
 		Side: Quantity
 		Tier: 5
-		Name: Field Medic
-		Description: Adds a medic.
+		Faction: Allies
+		Name: Reinforcements III
+		Description: This building adds 1 Medic.
 		Cost: 650
 		Duration: 900
 		Effect: AddUnit
 		Unit: MEDI
+		Count: 1
+	HelixNode@qn5s:
+		Id: qn5
+		Side: Quantity
+		Tier: 5
+		Faction: Soviet
+		Name: Reinforcements III
+		Description: This building adds 1 Rifle Infantry.
+		Cost: 650
+		Duration: 900
+		Effect: AddUnit
+		Unit: E1
 		Count: 1
 	HelixNode@ql6:
 		Id: ql6
 		Side: Quality
 		Tier: 6
 		Major: true
-		Name: Armor Specialists
-		Description: MAJOR: 2 riflemen become tank hunters.
+		Name: Veteran Specialists
+		Description: MAJOR: This building turns 2 Rifle Infantry into Tank Hunters.
 		Cost: 1500
 		Duration: 1375
 		Effect: Replace
@@ -1526,8 +1630,8 @@ AFAT:
 		Side: Quantity
 		Tier: 6
 		Major: true
-		Name: Mass Rocket Troops
-		Description: MAJOR: adds 4 rocket soldiers.
+		Name: Heavy Platoon
+		Description: MAJOR: This building adds 4 Rocket Soldiers.
 		Cost: 1500
 		Duration: 1375
 		Effect: AddUnit
@@ -1537,18 +1641,18 @@ AFAT:
 		Id: ql7
 		Side: Quality
 		Tier: 7
-		Name: Auto Loaders
-		Description: Squad fires 15% faster.
+		Name: Armor Piercing
+		Description: All infantry squads deal 15% more damage.
 		Cost: 800
 		Duration: 1050
-		Effect: FireRate
+		Effect: Damage
 		Value: 15
 	HelixNode@qn7:
 		Id: qn7
 		Side: Quantity
 		Tier: 7
 		Name: Veteran Cadre
-		Description: Adds 2 more of your newest special unit.
+		Description: Adds 2 more of this building's newest special unit.
 		Cost: 800
 		Duration: 1050
 		Effect: AddElite
@@ -1557,18 +1661,18 @@ AFAT:
 		Id: ql8
 		Side: Quality
 		Tier: 8
-		Name: Depleted Core
-		Description: Squad deals 20% more damage.
+		Name: Rapid Fire Doctrine
+		Description: All infantry squads fire 15% faster.
 		Cost: 900
 		Duration: 1200
-		Effect: Damage
-		Value: 20
+		Effect: FireRate
+		Value: 15
 	HelixNode@qn8:
 		Id: qn8
 		Side: Quantity
 		Tier: 8
-		Name: Combat Engineer
-		Description: Adds an engineer.
+		Name: Reinforcements IV
+		Description: This building adds 1 Engineer.
 		Cost: 900
 		Duration: 1200
 		Effect: AddUnit
@@ -1579,8 +1683,8 @@ AFAT:
 		Side: Quality
 		Tier: 9
 		Major: true
-		Name: Siege Breakers
-		Description: MAJOR: 3 more rocket soldiers become tank hunters.
+		Name: Special Forces
+		Description: MAJOR: This building turns 3 Rocket Soldiers into Tank Hunters.
 		Cost: 2200
 		Duration: 1750
 		Effect: Replace
@@ -1592,8 +1696,8 @@ AFAT:
 		Side: Quantity
 		Tier: 9
 		Major: true
-		Name: Armor Doctrine
-		Description: MAJOR: adds 4 tank hunters.
+		Name: Mass Levy
+		Description: MAJOR: This building adds 4 Tank Hunters.
 		Cost: 2200
 		Duration: 1750
 		Effect: AddUnit
@@ -1633,25 +1737,43 @@ AFDEMO:
 		ProductionType: AutoInf
 		SpawnInterval: 170
 		InitialDelay: 75
+		TreeGroup: infantry
 		Roster:
+			E1: 4
+			E3: 2
+			E6: 2
+		SovietRoster:
 			E4: 4
 			E2: 4
 	HelixNode@ql1:
 		Id: ql1
 		Side: Quality
 		Tier: 1
-		Name: Napalm Mix
-		Description: Squad deals 10% more damage.
+		Name: Forced March
+		Description: All infantry squads move 10% faster.
 		Cost: 300
 		Duration: 450
-		Effect: Damage
+		Effect: Speed
 		Value: 10
-	HelixNode@qn1:
+	HelixNode@qn1a:
 		Id: qn1
 		Side: Quantity
 		Tier: 1
-		Name: Extra Flamer
-		Description: Adds a flamethrower.
+		Faction: Allies
+		Name: Reinforcements I
+		Description: This building adds 1 Engineer.
+		Cost: 300
+		Duration: 450
+		Effect: AddUnit
+		Unit: E6
+		Count: 1
+	HelixNode@qn1s:
+		Id: qn1
+		Side: Quantity
+		Tier: 1
+		Faction: Soviet
+		Name: Reinforcements I
+		Description: This building adds 1 Flamethrower.
 		Cost: 300
 		Duration: 450
 		Effect: AddUnit
@@ -1661,43 +1783,85 @@ AFDEMO:
 		Id: ql2
 		Side: Quality
 		Tier: 2
-		Name: Sprint Training
-		Description: Squad moves 10% faster.
+		Name: Hardened Rounds
+		Description: All infantry squads deal 10% more damage.
 		Cost: 400
 		Duration: 600
-		Effect: Speed
+		Effect: Damage
 		Value: 10
-	HelixNode@qn2:
+	HelixNode@qn2a:
 		Id: qn2
 		Side: Quantity
 		Tier: 2
-		Name: Extra Grenadier
-		Description: Adds a grenadier.
+		Faction: Allies
+		Name: Reinforcements II
+		Description: This building adds 1 Rocket Soldier.
+		Cost: 400
+		Duration: 600
+		Effect: AddUnit
+		Unit: E3
+		Count: 1
+	HelixNode@qn2s:
+		Id: qn2
+		Side: Quantity
+		Tier: 2
+		Faction: Soviet
+		Name: Reinforcements II
+		Description: This building adds 1 Grenadier.
 		Cost: 400
 		Duration: 600
 		Effect: AddUnit
 		Unit: E2
 		Count: 1
-	HelixNode@ql3:
+	HelixNode@ql3a:
 		Id: ql3
 		Side: Quality
 		Tier: 3
+		Faction: Allies
 		Major: true
-		Name: Shock Assault
-		Description: MAJOR: 2 flamers become shock troopers.
+		Name: Elite Training
+		Description: MAJOR: This building turns 2 Rifle Infantry into Spies.
+		Cost: 900
+		Duration: 1000
+		Effect: Replace
+		Unit: SPY
+		From: E1
+		Count: 2
+	HelixNode@ql3s:
+		Id: ql3
+		Side: Quality
+		Tier: 3
+		Faction: Soviet
+		Major: true
+		Name: Elite Training
+		Description: MAJOR: This building turns 2 Flamethrowers into Shock Troopers.
 		Cost: 900
 		Duration: 1000
 		Effect: Replace
 		Unit: SHOK
 		From: E4
 		Count: 2
-	HelixNode@qn3:
+	HelixNode@qn3a:
 		Id: qn3
 		Side: Quantity
 		Tier: 3
+		Faction: Allies
 		Major: true
-		Name: Attack Dogs
-		Description: MAJOR: adds 3 attack dogs.
+		Name: Specialist Section
+		Description: MAJOR: This building adds 2 Mechanics.
+		Cost: 900
+		Duration: 1000
+		Effect: AddUnit
+		Unit: MECH
+		Count: 2
+	HelixNode@qn3s:
+		Id: qn3
+		Side: Quantity
+		Tier: 3
+		Faction: Soviet
+		Major: true
+		Name: Specialist Section
+		Description: MAJOR: This building adds 3 Attack Dogs.
 		Cost: 900
 		Duration: 1000
 		Effect: AddUnit
@@ -1707,8 +1871,8 @@ AFDEMO:
 		Id: ql4
 		Side: Quality
 		Tier: 4
-		Name: Quick Hands
-		Description: Squad fires 10% faster.
+		Name: Drilled Reloads
+		Description: All infantry squads fire 10% faster.
 		Cost: 550
 		Duration: 750
 		Effect: FireRate
@@ -1717,8 +1881,8 @@ AFDEMO:
 		Id: qn4
 		Side: Quantity
 		Tier: 4
-		Name: More Hounds
-		Description: Adds 2 more of your newest special unit.
+		Name: Reinforce Elites
+		Description: Adds 2 more of this building's newest special unit.
 		Cost: 550
 		Duration: 750
 		Effect: AddElite
@@ -1727,43 +1891,85 @@ AFDEMO:
 		Id: ql5
 		Side: Quality
 		Tier: 5
-		Name: Thermite Charges
-		Description: Squad deals 15% more damage.
+		Name: Light Kit
+		Description: All infantry squads move 10% faster.
 		Cost: 650
 		Duration: 900
-		Effect: Damage
-		Value: 15
-	HelixNode@qn5:
+		Effect: Speed
+		Value: 10
+	HelixNode@qn5a:
 		Id: qn5
 		Side: Quantity
 		Tier: 5
-		Name: Burner Crew
-		Description: Adds 2 flamers.
+		Faction: Allies
+		Name: Reinforcements III
+		Description: This building adds 1 Medic.
+		Cost: 650
+		Duration: 900
+		Effect: AddUnit
+		Unit: MEDI
+		Count: 1
+	HelixNode@qn5s:
+		Id: qn5
+		Side: Quantity
+		Tier: 5
+		Faction: Soviet
+		Name: Reinforcements III
+		Description: This building adds 2 Flamethrowers.
 		Cost: 650
 		Duration: 900
 		Effect: AddUnit
 		Unit: E4
 		Count: 2
-	HelixNode@ql6:
+	HelixNode@ql6a:
 		Id: ql6
 		Side: Quality
 		Tier: 6
+		Faction: Allies
 		Major: true
-		Name: Tesla Vanguard
-		Description: MAJOR: 2 grenadiers become shock troopers.
+		Name: Veteran Specialists
+		Description: MAJOR: This building turns 2 Rifle Infantry into Machine Gunners.
+		Cost: 1500
+		Duration: 1375
+		Effect: Replace
+		Unit: MGUN
+		From: E1
+		Count: 2
+	HelixNode@ql6s:
+		Id: ql6
+		Side: Quality
+		Tier: 6
+		Faction: Soviet
+		Major: true
+		Name: Veteran Specialists
+		Description: MAJOR: This building turns 2 Grenadiers into Shock Troopers.
 		Cost: 1500
 		Duration: 1375
 		Effect: Replace
 		Unit: SHOK
 		From: E2
 		Count: 2
-	HelixNode@qn6:
+	HelixNode@qn6a:
 		Id: qn6
 		Side: Quantity
 		Tier: 6
+		Faction: Allies
 		Major: true
-		Name: Flame Battalion
-		Description: MAJOR: adds 4 flamers.
+		Name: Heavy Platoon
+		Description: MAJOR: This building adds 4 Rocket Soldiers.
+		Cost: 1500
+		Duration: 1375
+		Effect: AddUnit
+		Unit: E3
+		Count: 4
+	HelixNode@qn6s:
+		Id: qn6
+		Side: Quantity
+		Tier: 6
+		Faction: Soviet
+		Major: true
+		Name: Heavy Platoon
+		Description: MAJOR: This building adds 4 Flamethrowers.
 		Cost: 1500
 		Duration: 1375
 		Effect: AddUnit
@@ -1773,18 +1979,18 @@ AFDEMO:
 		Id: ql7
 		Side: Quality
 		Tier: 7
-		Name: Assault Kit
-		Description: Squad moves 10% faster.
+		Name: Armor Piercing
+		Description: All infantry squads deal 15% more damage.
 		Cost: 800
 		Duration: 1050
-		Effect: Speed
-		Value: 10
+		Effect: Damage
+		Value: 15
 	HelixNode@qn7:
 		Id: qn7
 		Side: Quantity
 		Tier: 7
 		Name: Veteran Cadre
-		Description: Adds 2 more of your newest special unit.
+		Description: Adds 2 more of this building's newest special unit.
 		Cost: 800
 		Duration: 1050
 		Effect: AddElite
@@ -1793,43 +1999,85 @@ AFDEMO:
 		Id: ql8
 		Side: Quality
 		Tier: 8
-		Name: Overpressure
-		Description: Squad deals 20% more damage.
+		Name: Rapid Fire Doctrine
+		Description: All infantry squads fire 15% faster.
 		Cost: 900
 		Duration: 1200
-		Effect: Damage
-		Value: 20
-	HelixNode@qn8:
+		Effect: FireRate
+		Value: 15
+	HelixNode@qn8a:
 		Id: qn8
 		Side: Quantity
 		Tier: 8
-		Name: Grenade Crew
-		Description: Adds 2 grenadiers.
+		Faction: Allies
+		Name: Reinforcements IV
+		Description: This building adds 1 Engineer.
+		Cost: 900
+		Duration: 1200
+		Effect: AddUnit
+		Unit: E6
+		Count: 1
+	HelixNode@qn8s:
+		Id: qn8
+		Side: Quantity
+		Tier: 8
+		Faction: Soviet
+		Name: Reinforcements IV
+		Description: This building adds 2 Grenadiers.
 		Cost: 900
 		Duration: 1200
 		Effect: AddUnit
 		Unit: E2
 		Count: 2
-	HelixNode@ql9:
+	HelixNode@ql9a:
 		Id: ql9
 		Side: Quality
 		Tier: 9
+		Faction: Allies
 		Major: true
-		Name: Demolition Expert
-		Description: MAJOR: 1 flamer becomes a commando.
+		Name: Special Forces
+		Description: MAJOR: This building turns 1 Rocket Soldier into Commando.
 		Cost: 2200
 		Duration: 1750
 		Effect: Replace
 		Unit: E7
-		From: E4
+		From: E3
 		Count: 1
-	HelixNode@qn9:
+	HelixNode@ql9s:
+		Id: ql9
+		Side: Quality
+		Tier: 9
+		Faction: Soviet
+		Major: true
+		Name: Special Forces
+		Description: MAJOR: This building turns 2 Flamethrowers into Shock Troopers.
+		Cost: 2200
+		Duration: 1750
+		Effect: Replace
+		Unit: SHOK
+		From: E4
+		Count: 2
+	HelixNode@qn9a:
 		Id: qn9
 		Side: Quantity
 		Tier: 9
+		Faction: Allies
 		Major: true
-		Name: Blitz Levy
-		Description: MAJOR: adds 4 grenadiers.
+		Name: Mass Levy
+		Description: MAJOR: This building adds 6 Rocket Soldiers.
+		Cost: 2200
+		Duration: 1750
+		Effect: AddUnit
+		Unit: E3
+		Count: 6
+	HelixNode@qn9s:
+		Id: qn9
+		Side: Quantity
+		Tier: 9
+		Faction: Soviet
+		Major: true
+		Name: Mass Levy
+		Description: MAJOR: This building adds 4 Grenadiers.
 		Cost: 2200
 		Duration: 1750
 		Effect: AddUnit
@@ -1862,81 +2110,139 @@ AFMAIN:
 		ProductionType: AutoVeh
 		SpawnInterval: 450
 		InitialDelay: 150
+		TreeGroup: factory
 		Roster:
 			2TNK: 4
+		SovietRoster:
+			3TNK: 3
 	HelixNode@ql1:
 		Id: ql1
 		Side: Quality
 		Tier: 1
 		Name: Depleted Shells
-		Description: Squad deals 10% more damage.
+		Description: All factory squads deal 10% more damage.
 		Cost: 450
 		Duration: 575
 		Effect: Damage
 		Value: 10
-	HelixNode@qn1:
+	HelixNode@qn1a:
 		Id: qn1
 		Side: Quantity
 		Tier: 1
+		Faction: Allies
 		Name: Extra Chassis
-		Description: Adds a medium tank.
+		Description: This building adds 1 Medium Tank.
 		Cost: 450
 		Duration: 575
 		Effect: AddUnit
 		Unit: 2TNK
+		Count: 1
+	HelixNode@qn1s:
+		Id: qn1
+		Side: Quantity
+		Tier: 1
+		Faction: Soviet
+		Name: Extra Chassis
+		Description: This building adds 1 Heavy Tank.
+		Cost: 450
+		Duration: 575
+		Effect: AddUnit
+		Unit: 3TNK
 		Count: 1
 	HelixNode@ql2:
 		Id: ql2
 		Side: Quality
 		Tier: 2
 		Name: Tuned Engines
-		Description: Squad moves 10% faster.
+		Description: All factory squads move 10% faster.
 		Cost: 600
 		Duration: 775
 		Effect: Speed
 		Value: 10
-	HelixNode@qn2:
+	HelixNode@qn2a:
 		Id: qn2
 		Side: Quantity
 		Tier: 2
-		Name: Light Tank Screen
-		Description: Adds 2 light tanks.
+		Faction: Allies
+		Name: Second Line
+		Description: This building adds 2 Light Tanks.
 		Cost: 600
 		Duration: 775
 		Effect: AddUnit
 		Unit: 1TNK
 		Count: 2
-	HelixNode@ql3:
+	HelixNode@qn2s:
+		Id: qn2
+		Side: Quantity
+		Tier: 2
+		Faction: Soviet
+		Name: Second Line
+		Description: This building adds 2 Flak Trucks.
+		Cost: 600
+		Duration: 775
+		Effect: AddUnit
+		Unit: FTRK
+		Count: 2
+	HelixNode@ql3a:
 		Id: ql3
 		Side: Quality
 		Tier: 3
+		Faction: Allies
 		Major: true
 		Name: Heavy Armor
-		Description: MAJOR: 2 medium tanks become heavy tanks.
+		Description: MAJOR: This building turns 2 Medium Tanks into Patton Tanks.
 		Cost: 1350
 		Duration: 1300
 		Effect: Replace
-		Unit: 3TNK
+		Unit: PTNK
 		From: 2TNK
 		Count: 2
-	HelixNode@qn3:
+	HelixNode@ql3s:
+		Id: ql3
+		Side: Quality
+		Tier: 3
+		Faction: Soviet
+		Major: true
+		Name: Heavy Armor
+		Description: MAJOR: This building turns 1 Heavy Tank into Mammoth Tank.
+		Cost: 1350
+		Duration: 1300
+		Effect: Replace
+		Unit: 4TNK
+		From: 3TNK
+		Count: 1
+	HelixNode@qn3a:
 		Id: qn3
 		Side: Quantity
 		Tier: 3
+		Faction: Allies
 		Major: true
-		Name: Light Tank Wing
-		Description: MAJOR: adds 3 light tanks.
+		Name: Motor Pool
+		Description: MAJOR: This building adds 3 Light Tanks.
 		Cost: 1350
 		Duration: 1300
 		Effect: AddUnit
 		Unit: 1TNK
 		Count: 3
+	HelixNode@qn3s:
+		Id: qn3
+		Side: Quantity
+		Tier: 3
+		Faction: Soviet
+		Major: true
+		Name: Motor Pool
+		Description: MAJOR: This building adds 2 Heavy Tanks.
+		Cost: 1350
+		Duration: 1300
+		Effect: AddUnit
+		Unit: 3TNK
+		Count: 2
 	HelixNode@ql4:
 		Id: ql4
 		Side: Quality
 		Tier: 4
 		Name: Autoloaders
-		Description: Squad fires 10% faster.
+		Description: All factory squads fire 10% faster.
 		Cost: 800
 		Duration: 975
 		Effect: FireRate
@@ -1946,63 +2252,105 @@ AFMAIN:
 		Side: Quantity
 		Tier: 4
 		Name: Reinforce Elites
-		Description: Adds 2 more of your newest special unit.
+		Description: Adds 1 more of this building's newest special unit.
 		Cost: 800
 		Duration: 975
 		Effect: AddElite
-		Count: 2
+		Count: 1
 	HelixNode@ql5:
 		Id: ql5
 		Side: Quality
 		Tier: 5
 		Name: Reinforced Barrels
-		Description: Squad deals 10% more damage.
+		Description: All factory squads deal 10% more damage.
 		Cost: 1000
 		Duration: 1175
 		Effect: Damage
 		Value: 10
-	HelixNode@qn5:
+	HelixNode@qn5a:
 		Id: qn5
 		Side: Quantity
 		Tier: 5
-		Name: Second Chassis
-		Description: Adds a medium tank.
+		Faction: Allies
+		Name: Support Vehicles
+		Description: This building adds 1 Medium Tank.
 		Cost: 1000
 		Duration: 1175
 		Effect: AddUnit
 		Unit: 2TNK
 		Count: 1
-	HelixNode@ql6:
+	HelixNode@qn5s:
+		Id: qn5
+		Side: Quantity
+		Tier: 5
+		Faction: Soviet
+		Name: Support Vehicles
+		Description: This building adds 1 Heavy Tank.
+		Cost: 1000
+		Duration: 1175
+		Effect: AddUnit
+		Unit: 3TNK
+		Count: 1
+	HelixNode@ql6a:
 		Id: ql6
 		Side: Quality
 		Tier: 6
+		Faction: Allies
 		Major: true
-		Name: Mammoth Guard
-		Description: MAJOR: 1 medium tank becomes a mammoth tank.
+		Name: Elite Hardware
+		Description: MAJOR: This building turns 1 Medium Tank into Patton Tank.
+		Cost: 2250
+		Duration: 1800
+		Effect: Replace
+		Unit: PTNK
+		From: 2TNK
+		Count: 1
+	HelixNode@ql6s:
+		Id: ql6
+		Side: Quality
+		Tier: 6
+		Faction: Soviet
+		Major: true
+		Name: Elite Hardware
+		Description: MAJOR: This building turns 1 Heavy Tank into Mammoth Tank.
 		Cost: 2250
 		Duration: 1800
 		Effect: Replace
 		Unit: 4TNK
-		From: 2TNK
+		From: 3TNK
 		Count: 1
-	HelixNode@qn6:
+	HelixNode@qn6a:
 		Id: qn6
 		Side: Quantity
 		Tier: 6
+		Faction: Allies
 		Major: true
 		Name: Armored Reserve
-		Description: MAJOR: adds 2 heavy tanks.
+		Description: MAJOR: This building adds 2 Patton Tanks.
 		Cost: 2250
 		Duration: 1800
 		Effect: AddUnit
-		Unit: 3TNK
+		Unit: PTNK
 		Count: 2
+	HelixNode@qn6s:
+		Id: qn6
+		Side: Quantity
+		Tier: 6
+		Faction: Soviet
+		Major: true
+		Name: Armored Reserve
+		Description: MAJOR: This building adds 1 Mammoth Tank.
+		Cost: 2250
+		Duration: 1800
+		Effect: AddUnit
+		Unit: 4TNK
+		Count: 1
 	HelixNode@ql7:
 		Id: ql7
 		Side: Quality
 		Tier: 7
 		Name: Overdrive
-		Description: Squad moves 10% faster.
+		Description: All factory squads move 10% faster.
 		Cost: 1200
 		Duration: 1375
 		Effect: Speed
@@ -2012,7 +2360,7 @@ AFMAIN:
 		Side: Quantity
 		Tier: 7
 		Name: Veteran Cadre
-		Description: Adds 1 more of your newest special unit.
+		Description: Adds 1 more of this building's newest special unit.
 		Cost: 1200
 		Duration: 1375
 		Effect: AddElite
@@ -2022,46 +2370,88 @@ AFMAIN:
 		Side: Quality
 		Tier: 8
 		Name: Rapid Cycling
-		Description: Squad fires 15% faster.
+		Description: All factory squads fire 15% faster.
 		Cost: 1350
 		Duration: 1550
 		Effect: FireRate
 		Value: 15
-	HelixNode@qn8:
+	HelixNode@qn8a:
 		Id: qn8
 		Side: Quantity
 		Tier: 8
-		Name: Scout Tanks
-		Description: Adds 2 light tanks.
+		Faction: Allies
+		Name: Specialists
+		Description: This building adds 2 Light Tanks.
 		Cost: 1350
 		Duration: 1550
 		Effect: AddUnit
 		Unit: 1TNK
 		Count: 2
-	HelixNode@ql9:
+	HelixNode@qn8s:
+		Id: qn8
+		Side: Quantity
+		Tier: 8
+		Faction: Soviet
+		Name: Specialists
+		Description: This building adds 2 Flak Trucks.
+		Cost: 1350
+		Duration: 1550
+		Effect: AddUnit
+		Unit: FTRK
+		Count: 2
+	HelixNode@ql9a:
 		Id: ql9
 		Side: Quality
 		Tier: 9
+		Faction: Allies
 		Major: true
 		Name: Super Heavy Doctrine
-		Description: MAJOR: 2 heavy tanks become mammoth tanks.
+		Description: MAJOR: This building turns 1 Patton Tank into Chrono Tank.
 		Cost: 3300
 		Duration: 2275
 		Effect: Replace
-		Unit: 4TNK
+		Unit: CTNK
+		From: PTNK
+		Count: 1
+	HelixNode@ql9s:
+		Id: ql9
+		Side: Quality
+		Tier: 9
+		Faction: Soviet
+		Major: true
+		Name: Super Heavy Doctrine
+		Description: MAJOR: This building turns 1 Heavy Tank into Tesla Tank.
+		Cost: 3300
+		Duration: 2275
+		Effect: Replace
+		Unit: TTNK
 		From: 3TNK
-		Count: 2
-	HelixNode@qn9:
+		Count: 1
+	HelixNode@qn9a:
 		Id: qn9
 		Side: Quantity
 		Tier: 9
+		Faction: Allies
 		Major: true
-		Name: Tank Army
-		Description: MAJOR: adds 3 medium tanks.
+		Name: Grand Army
+		Description: MAJOR: This building adds 3 Medium Tanks.
 		Cost: 3300
 		Duration: 2275
 		Effect: AddUnit
 		Unit: 2TNK
+		Count: 3
+	HelixNode@qn9s:
+		Id: qn9
+		Side: Quantity
+		Tier: 9
+		Faction: Soviet
+		Major: true
+		Name: Grand Army
+		Description: MAJOR: This building adds 3 Heavy Tanks.
+		Cost: 3300
+		Duration: 2275
+		Effect: AddUnit
+		Unit: 3TNK
 		Count: 3
 
 AFUTIL:
@@ -2089,82 +2479,140 @@ AFUTIL:
 		ProductionType: AutoVeh
 		SpawnInterval: 380
 		InitialDelay: 150
+		TreeGroup: factory
 		Roster:
-			JEEP: 2
+			JEEP: 3
+		SovietRoster:
 			APC: 2
+			FTRK: 2
 	HelixNode@ql1:
 		Id: ql1
 		Side: Quality
 		Tier: 1
-		Name: Racing Tires
-		Description: Squad moves 10% faster.
+		Name: Depleted Shells
+		Description: All factory squads deal 10% more damage.
 		Cost: 450
 		Duration: 575
-		Effect: Speed
+		Effect: Damage
 		Value: 10
-	HelixNode@qn1:
+	HelixNode@qn1a:
 		Id: qn1
 		Side: Quantity
 		Tier: 1
-		Name: Extra Scout
-		Description: Adds a scout vehicle.
+		Faction: Allies
+		Name: Extra Chassis
+		Description: This building adds 1 Scout Vehicle.
 		Cost: 450
 		Duration: 575
 		Effect: AddUnit
 		Unit: JEEP
 		Count: 1
+	HelixNode@qn1s:
+		Id: qn1
+		Side: Quantity
+		Tier: 1
+		Faction: Soviet
+		Name: Extra Chassis
+		Description: This building adds 1 Armored Transport.
+		Cost: 450
+		Duration: 575
+		Effect: AddUnit
+		Unit: APC
+		Count: 1
 	HelixNode@ql2:
 		Id: ql2
 		Side: Quality
 		Tier: 2
-		Name: Better Guns
-		Description: Squad deals 10% more damage.
+		Name: Tuned Engines
+		Description: All factory squads move 10% faster.
 		Cost: 600
 		Duration: 775
-		Effect: Damage
+		Effect: Speed
 		Value: 10
-	HelixNode@qn2:
+	HelixNode@qn2a:
 		Id: qn2
 		Side: Quantity
 		Tier: 2
-		Name: Extra Transport
-		Description: Adds a transport.
+		Faction: Allies
+		Name: Second Line
+		Description: This building adds 1 Scout Vehicle.
 		Cost: 600
 		Duration: 775
 		Effect: AddUnit
-		Unit: APC
+		Unit: JEEP
 		Count: 1
-	HelixNode@ql3:
+	HelixNode@qn2s:
+		Id: qn2
+		Side: Quantity
+		Tier: 2
+		Faction: Soviet
+		Name: Second Line
+		Description: This building adds 1 Flak Truck.
+		Cost: 600
+		Duration: 775
+		Effect: AddUnit
+		Unit: FTRK
+		Count: 1
+	HelixNode@ql3a:
 		Id: ql3
 		Side: Quality
 		Tier: 3
+		Faction: Allies
 		Major: true
-		Name: Recon Specialists
-		Description: MAJOR: 2 scouts become stealth tanks.
+		Name: Heavy Armor
+		Description: MAJOR: This building turns 2 Scout Vehicles into Phase Transports.
 		Cost: 1350
 		Duration: 1300
 		Effect: Replace
 		Unit: STNK
 		From: JEEP
 		Count: 2
-	HelixNode@qn3:
+	HelixNode@ql3s:
+		Id: ql3
+		Side: Quality
+		Tier: 3
+		Faction: Soviet
+		Major: true
+		Name: Heavy Armor
+		Description: MAJOR: This building turns 1 Armored Transport into Demolition Truck.
+		Cost: 1350
+		Duration: 1300
+		Effect: Replace
+		Unit: DTRK
+		From: APC
+		Count: 1
+	HelixNode@qn3a:
 		Id: qn3
 		Side: Quantity
 		Tier: 3
+		Faction: Allies
 		Major: true
 		Name: Motor Pool
-		Description: MAJOR: adds 3 scout vehicles.
+		Description: MAJOR: This building adds 3 Scout Vehicles.
 		Cost: 1350
 		Duration: 1300
 		Effect: AddUnit
 		Unit: JEEP
 		Count: 3
+	HelixNode@qn3s:
+		Id: qn3
+		Side: Quantity
+		Tier: 3
+		Faction: Soviet
+		Major: true
+		Name: Motor Pool
+		Description: MAJOR: This building adds 3 Armored Transports.
+		Cost: 1350
+		Duration: 1300
+		Effect: AddUnit
+		Unit: APC
+		Count: 3
 	HelixNode@ql4:
 		Id: ql4
 		Side: Quality
 		Tier: 4
-		Name: Fast Loaders
-		Description: Squad fires 10% faster.
+		Name: Autoloaders
+		Description: All factory squads fire 10% faster.
 		Cost: 800
 		Duration: 975
 		Effect: FireRate
@@ -2174,73 +2622,102 @@ AFUTIL:
 		Side: Quantity
 		Tier: 4
 		Name: Reinforce Elites
-		Description: Adds 2 more of your newest special unit.
+		Description: Adds 1 more of this building's newest special unit.
 		Cost: 800
 		Duration: 975
 		Effect: AddElite
-		Count: 2
+		Count: 1
 	HelixNode@ql5:
 		Id: ql5
 		Side: Quality
 		Tier: 5
-		Name: Turbo Engines
-		Description: Squad moves 10% faster.
+		Name: Reinforced Barrels
+		Description: All factory squads deal 10% more damage.
 		Cost: 1000
 		Duration: 1175
-		Effect: Speed
+		Effect: Damage
 		Value: 10
 	HelixNode@qn5:
 		Id: qn5
 		Side: Quantity
 		Tier: 5
-		Name: Minelayer
-		Description: Adds a minelayer.
+		Name: Support Vehicles
+		Description: This building adds 1 Minelayer.
 		Cost: 1000
 		Duration: 1175
 		Effect: AddUnit
 		Unit: MNLY
 		Count: 1
-	HelixNode@ql6:
+	HelixNode@ql6a:
 		Id: ql6
 		Side: Quality
 		Tier: 6
+		Faction: Allies
 		Major: true
-		Name: Chrono Detachment
-		Description: MAJOR: 1 transport becomes a chrono tank.
+		Name: Elite Hardware
+		Description: MAJOR: This building turns 1 Scout Vehicle into Radar Jammer.
 		Cost: 2250
 		Duration: 1800
 		Effect: Replace
-		Unit: CTNK
-		From: APC
+		Unit: MRJ
+		From: JEEP
 		Count: 1
-	HelixNode@qn6:
+	HelixNode@ql6s:
+		Id: ql6
+		Side: Quality
+		Tier: 6
+		Faction: Soviet
+		Major: true
+		Name: Elite Hardware
+		Description: MAJOR: This building turns 1 Flak Truck into Tesla Tank.
+		Cost: 2250
+		Duration: 1800
+		Effect: Replace
+		Unit: TTNK
+		From: FTRK
+		Count: 1
+	HelixNode@qn6a:
 		Id: qn6
 		Side: Quantity
 		Tier: 6
+		Faction: Allies
 		Major: true
-		Name: Troop Convoy
-		Description: MAJOR: adds 3 transports.
+		Name: Armored Reserve
+		Description: MAJOR: This building adds 2 Phase Transports.
 		Cost: 2250
 		Duration: 1800
 		Effect: AddUnit
-		Unit: APC
+		Unit: STNK
+		Count: 2
+	HelixNode@qn6s:
+		Id: qn6
+		Side: Quantity
+		Tier: 6
+		Faction: Soviet
+		Major: true
+		Name: Armored Reserve
+		Description: MAJOR: This building adds 3 Flak Trucks.
+		Cost: 2250
+		Duration: 1800
+		Effect: AddUnit
+		Unit: FTRK
 		Count: 3
 	HelixNode@ql7:
 		Id: ql7
 		Side: Quality
 		Tier: 7
-		Name: Hot Loads
-		Description: Squad deals 15% more damage.
+		Name: Overdrive
+		Description: All factory squads move 10% faster.
 		Cost: 1200
 		Duration: 1375
-		Effect: Damage
-		Value: 15
+		Effect: Speed
+		Value: 10
 	HelixNode@qn7:
 		Id: qn7
 		Side: Quantity
 		Tier: 7
 		Name: Veteran Cadre
-		Description: Adds 1 more of your newest special unit.
+		Description: Adds 1 more of this building's newest special unit.
 		Cost: 1200
 		Duration: 1375
 		Effect: AddElite
@@ -2249,43 +2726,85 @@ AFUTIL:
 		Id: ql8
 		Side: Quality
 		Tier: 8
-		Name: Rapid Fire Mounts
-		Description: Squad fires 15% faster.
+		Name: Rapid Cycling
+		Description: All factory squads fire 15% faster.
 		Cost: 1350
 		Duration: 1550
 		Effect: FireRate
 		Value: 15
-	HelixNode@qn8:
+	HelixNode@qn8a:
 		Id: qn8
 		Side: Quantity
 		Tier: 8
-		Name: Gap Generator
-		Description: Adds a gap generator.
+		Faction: Allies
+		Name: Specialists
+		Description: This building adds 1 Gap Generator.
 		Cost: 1350
 		Duration: 1550
 		Effect: AddUnit
 		Unit: MGG
 		Count: 1
-	HelixNode@ql9:
+	HelixNode@qn8s:
+		Id: qn8
+		Side: Quantity
+		Tier: 8
+		Faction: Soviet
+		Name: Specialists
+		Description: This building adds 1 Armored Transport.
+		Cost: 1350
+		Duration: 1550
+		Effect: AddUnit
+		Unit: APC
+		Count: 1
+	HelixNode@ql9a:
 		Id: ql9
 		Side: Quality
 		Tier: 9
+		Faction: Allies
 		Major: true
-		Name: Tesla Escorts
-		Description: MAJOR: 2 transports become tesla tanks.
+		Name: Super Heavy Doctrine
+		Description: MAJOR: This building turns 1 Scout Vehicle into Gap Generator.
+		Cost: 3300
+		Duration: 2275
+		Effect: Replace
+		Unit: MGG
+		From: JEEP
+		Count: 1
+	HelixNode@ql9s:
+		Id: ql9
+		Side: Quality
+		Tier: 9
+		Faction: Soviet
+		Major: true
+		Name: Super Heavy Doctrine
+		Description: MAJOR: This building turns 1 Armored Transport into Tesla Tank.
 		Cost: 3300
 		Duration: 2275
 		Effect: Replace
 		Unit: TTNK
 		From: APC
-		Count: 2
-	HelixNode@qn9:
+		Count: 1
+	HelixNode@qn9a:
 		Id: qn9
 		Side: Quantity
 		Tier: 9
+		Faction: Allies
 		Major: true
-		Name: Logistics Fleet
-		Description: MAJOR: adds 4 transports.
+		Name: Grand Army
+		Description: MAJOR: This building adds 4 Scout Vehicles.
+		Cost: 3300
+		Duration: 2275
+		Effect: AddUnit
+		Unit: JEEP
+		Count: 4
+	HelixNode@qn9s:
+		Id: qn9
+		Side: Quantity
+		Tier: 9
+		Faction: Soviet
+		Major: true
+		Name: Grand Army
+		Description: MAJOR: This building adds 4 Armored Transports.
 		Cost: 3300
 		Duration: 2275
 		Effect: AddUnit
@@ -2317,92 +2836,149 @@ AFSIEGE:
 		ProductionType: AutoVeh
 		SpawnInterval: 480
 		InitialDelay: 150
+		TreeGroup: factory
 		Roster:
-			ARTY: 2
-			V2RL: 2
+			ARTY: 4
+		SovietRoster:
+			V2RL: 4
 	HelixNode@ql1:
 		Id: ql1
 		Side: Quality
 		Tier: 1
-		Name: High Explosive
-		Description: Squad deals 10% more damage.
+		Name: Depleted Shells
+		Description: All factory squads deal 10% more damage.
 		Cost: 450
 		Duration: 575
 		Effect: Damage
 		Value: 10
-	HelixNode@qn1:
+	HelixNode@qn1a:
 		Id: qn1
 		Side: Quantity
 		Tier: 1
-		Name: Extra Gun
-		Description: Adds an artillery piece.
+		Faction: Allies
+		Name: Extra Chassis
+		Description: This building adds 1 Artillery.
 		Cost: 450
 		Duration: 575
 		Effect: AddUnit
 		Unit: ARTY
+		Count: 1
+	HelixNode@qn1s:
+		Id: qn1
+		Side: Quantity
+		Tier: 1
+		Faction: Soviet
+		Name: Extra Chassis
+		Description: This building adds 1 V2 Launcher.
+		Cost: 450
+		Duration: 575
+		Effect: AddUnit
+		Unit: V2RL
 		Count: 1
 	HelixNode@ql2:
 		Id: ql2
 		Side: Quality
 		Tier: 2
-		Name: Crew Drill
-		Description: Squad fires 10% faster.
+		Name: Tuned Engines
+		Description: All factory squads move 10% faster.
 		Cost: 600
 		Duration: 775
-		Effect: FireRate
+		Effect: Speed
 		Value: 10
-	HelixNode@qn2:
+	HelixNode@qn2a:
 		Id: qn2
 		Side: Quantity
 		Tier: 2
-		Name: Extra Launcher
-		Description: Adds a V2 launcher.
+		Faction: Allies
+		Name: Second Line
+		Description: This building adds 1 Artillery.
+		Cost: 600
+		Duration: 775
+		Effect: AddUnit
+		Unit: ARTY
+		Count: 1
+	HelixNode@qn2s:
+		Id: qn2
+		Side: Quantity
+		Tier: 2
+		Faction: Soviet
+		Name: Second Line
+		Description: This building adds 1 V2 Launcher.
 		Cost: 600
 		Duration: 775
 		Effect: AddUnit
 		Unit: V2RL
 		Count: 1
-	HelixNode@ql3:
+	HelixNode@ql3a:
 		Id: ql3
 		Side: Quality
 		Tier: 3
+		Faction: Allies
 		Major: true
-		Name: Rocket Doctrine
-		Description: MAJOR: 2 artillery become V2 rocket launchers.
+		Name: Heavy Armor
+		Description: MAJOR: This building turns 1 Artillery into Patton Tank.
 		Cost: 1350
 		Duration: 1300
 		Effect: Replace
-		Unit: V2RL
+		Unit: PTNK
 		From: ARTY
-		Count: 2
-	HelixNode@qn3:
+		Count: 1
+	HelixNode@ql3s:
+		Id: ql3
+		Side: Quality
+		Tier: 3
+		Faction: Soviet
+		Major: true
+		Name: Heavy Armor
+		Description: MAJOR: This building turns 1 V2 Launcher into MAD Tank.
+		Cost: 1350
+		Duration: 1300
+		Effect: Replace
+		Unit: QTNK
+		From: V2RL
+		Count: 1
+	HelixNode@qn3a:
 		Id: qn3
 		Side: Quantity
 		Tier: 3
+		Faction: Allies
 		Major: true
-		Name: Battery Expansion
-		Description: MAJOR: adds 2 artillery.
+		Name: Motor Pool
+		Description: MAJOR: This building adds 2 Artillery.
 		Cost: 1350
 		Duration: 1300
 		Effect: AddUnit
 		Unit: ARTY
 		Count: 2
+	HelixNode@qn3s:
+		Id: qn3
+		Side: Quantity
+		Tier: 3
+		Faction: Soviet
+		Major: true
+		Name: Motor Pool
+		Description: MAJOR: This building adds 2 V2 Launchers.
+		Cost: 1350
+		Duration: 1300
+		Effect: AddUnit
+		Unit: V2RL
+		Count: 2
 	HelixNode@ql4:
 		Id: ql4
 		Side: Quality
 		Tier: 4
-		Name: Heavy Charges
-		Description: Squad deals 15% more damage.
+		Name: Autoloaders
+		Description: All factory squads fire 10% faster.
 		Cost: 800
 		Duration: 975
-		Effect: Damage
-		Value: 15
+		Effect: FireRate
+		Value: 10
 	HelixNode@qn4:
 		Id: qn4
 		Side: Quantity
 		Tier: 4
 		Name: Reinforce Elites
-		Description: Adds 1 more of your newest special unit.
+		Description: Adds 1 more of this building's newest special unit.
 		Cost: 800
 		Duration: 975
 		Effect: AddElite
@@ -2411,43 +2987,85 @@ AFSIEGE:
 		Id: ql5
 		Side: Quality
 		Tier: 5
-		Name: Tracked Prime Movers
-		Description: Squad moves 10% faster.
+		Name: Reinforced Barrels
+		Description: All factory squads deal 10% more damage.
 		Cost: 1000
 		Duration: 1175
-		Effect: Speed
+		Effect: Damage
 		Value: 10
-	HelixNode@qn5:
+	HelixNode@qn5a:
 		Id: qn5
 		Side: Quantity
 		Tier: 5
-		Name: Escort Tank
-		Description: Adds a medium tank escort.
+		Faction: Allies
+		Name: Support Vehicles
+		Description: This building adds 1 Medium Tank.
 		Cost: 1000
 		Duration: 1175
 		Effect: AddUnit
 		Unit: 2TNK
 		Count: 1
-	HelixNode@ql6:
+	HelixNode@qn5s:
+		Id: qn5
+		Side: Quantity
+		Tier: 5
+		Faction: Soviet
+		Name: Support Vehicles
+		Description: This building adds 1 Heavy Tank.
+		Cost: 1000
+		Duration: 1175
+		Effect: AddUnit
+		Unit: 3TNK
+		Count: 1
+	HelixNode@ql6a:
 		Id: ql6
 		Side: Quality
 		Tier: 6
+		Faction: Allies
 		Major: true
-		Name: Shock Wave Unit
-		Description: MAJOR: 1 V2 launcher becomes a MAD tank.
+		Name: Elite Hardware
+		Description: MAJOR: This building turns 1 Artillery into Patton Tank.
+		Cost: 2250
+		Duration: 1800
+		Effect: Replace
+		Unit: PTNK
+		From: ARTY
+		Count: 1
+	HelixNode@ql6s:
+		Id: ql6
+		Side: Quality
+		Tier: 6
+		Faction: Soviet
+		Major: true
+		Name: Elite Hardware
+		Description: MAJOR: This building turns 1 V2 Launcher into MAD Tank.
 		Cost: 2250
 		Duration: 1800
 		Effect: Replace
 		Unit: QTNK
 		From: V2RL
 		Count: 1
-	HelixNode@qn6:
+	HelixNode@qn6a:
 		Id: qn6
 		Side: Quantity
 		Tier: 6
+		Faction: Allies
 		Major: true
-		Name: Rocket Regiment
-		Description: MAJOR: adds 2 V2 launchers.
+		Name: Armored Reserve
+		Description: MAJOR: This building adds 2 Artillery.
+		Cost: 2250
+		Duration: 1800
+		Effect: AddUnit
+		Unit: ARTY
+		Count: 2
+	HelixNode@qn6s:
+		Id: qn6
+		Side: Quantity
+		Tier: 6
+		Faction: Soviet
+		Major: true
+		Name: Armored Reserve
+		Description: MAJOR: This building adds 2 V2 Launchers.
 		Cost: 2250
 		Duration: 1800
 		Effect: AddUnit
@@ -2457,18 +3075,18 @@ AFSIEGE:
 		Id: ql7
 		Side: Quality
 		Tier: 7
-		Name: Auto Feed
-		Description: Squad fires 10% faster.
+		Name: Overdrive
+		Description: All factory squads move 10% faster.
 		Cost: 1200
 		Duration: 1375
-		Effect: FireRate
+		Effect: Speed
 		Value: 10
 	HelixNode@qn7:
 		Id: qn7
 		Side: Quantity
 		Tier: 7
 		Name: Veteran Cadre
-		Description: Adds 1 more of your newest special unit.
+		Description: Adds 1 more of this building's newest special unit.
 		Cost: 1200
 		Duration: 1375
 		Effect: AddElite
@@ -2477,47 +3095,89 @@ AFSIEGE:
 		Id: ql8
 		Side: Quality
 		Tier: 8
-		Name: Deep Strike
-		Description: Squad deals 20% more damage.
+		Name: Rapid Cycling
+		Description: All factory squads fire 15% faster.
 		Cost: 1350
 		Duration: 1550
-		Effect: Damage
-		Value: 20
-	HelixNode@qn8:
+		Effect: FireRate
+		Value: 15
+	HelixNode@qn8a:
 		Id: qn8
 		Side: Quantity
 		Tier: 8
-		Name: Spotter
-		Description: Adds a scout vehicle.
+		Faction: Allies
+		Name: Specialists
+		Description: This building adds 1 Scout Vehicle.
 		Cost: 1350
 		Duration: 1550
 		Effect: AddUnit
 		Unit: JEEP
 		Count: 1
-	HelixNode@ql9:
+	HelixNode@qn8s:
+		Id: qn8
+		Side: Quantity
+		Tier: 8
+		Faction: Soviet
+		Name: Specialists
+		Description: This building adds 1 Flak Truck.
+		Cost: 1350
+		Duration: 1550
+		Effect: AddUnit
+		Unit: FTRK
+		Count: 1
+	HelixNode@ql9a:
 		Id: ql9
 		Side: Quality
 		Tier: 9
+		Faction: Allies
 		Major: true
-		Name: Doomsday Battery
-		Description: MAJOR: 1 artillery becomes a MAD tank.
+		Name: Super Heavy Doctrine
+		Description: MAJOR: This building turns 1 Artillery into Chrono Tank.
 		Cost: 3300
 		Duration: 2275
 		Effect: Replace
-		Unit: QTNK
+		Unit: CTNK
 		From: ARTY
 		Count: 1
-	HelixNode@qn9:
+	HelixNode@ql9s:
+		Id: ql9
+		Side: Quality
+		Tier: 9
+		Faction: Soviet
+		Major: true
+		Name: Super Heavy Doctrine
+		Description: MAJOR: This building turns 1 V2 Launcher into Mammoth Tank.
+		Cost: 3300
+		Duration: 2275
+		Effect: Replace
+		Unit: 4TNK
+		From: V2RL
+		Count: 1
+	HelixNode@qn9a:
 		Id: qn9
 		Side: Quantity
 		Tier: 9
+		Faction: Allies
 		Major: true
-		Name: Grand Battery
-		Description: MAJOR: adds 3 artillery.
+		Name: Grand Army
+		Description: MAJOR: This building adds 3 Artillery.
 		Cost: 3300
 		Duration: 2275
 		Effect: AddUnit
 		Unit: ARTY
+		Count: 3
+	HelixNode@qn9s:
+		Id: qn9
+		Side: Quantity
+		Tier: 9
+		Faction: Soviet
+		Major: true
+		Name: Grand Army
+		Description: MAJOR: This building adds 3 V2 Launchers.
+		Cost: 3300
+		Duration: 2275
+		Effect: AddUnit
+		Unit: V2RL
 		Count: 3
 
 SNPR:
@@ -2551,6 +3211,20 @@ MGUN:
 		Cost: 250
 	Armament@PRIMARY:
 		Weapon: MGunBurst
+
+PTNK:
+	Inherits: 2TNK
+	-Buildable:
+	RenderSprites:
+		Image: 2tnk
+	Tooltip:
+		Name: actor-ptnk.name
+	Selectable:
+		Class: PTNK
+	Valued:
+		Cost: 1000
+	Health:
+		HP: 70000
 
 HUNT:
 	Inherits: E3

@@ -68,16 +68,20 @@ for name, a in actors.items():
             bad = set(t["kv"]) - helix_fields
             if bad:
                 err("%s %s: unknown HelixNode fields %s" % (name, t["name"], sorted(bad)))
-            if t["kv"].get("Id") in ids:
+            if (t["kv"].get("Id"), t["kv"].get("Faction")) in ids:
                 err("%s: duplicate node id %s" % (name, t["kv"].get("Id")))
-            ids.add(t["kv"].get("Id"))
-            if t["name"].split("@")[1] != t["kv"].get("Id"):
-                err("%s: trait suffix and Id differ for %s" % (name, t["name"]))
+            ids.add((t["kv"].get("Id"), t["kv"].get("Faction")))
+            suffix = t["name"].split("@")[1]
+            fac = t["kv"].get("Faction")
+            if suffix != t["kv"].get("Id") + {"Allies": "a", "Soviet": "s"}.get(fac, ""):
+                err("%s: trait suffix and Id/Faction differ for %s" % (name, t["name"]))
             if t["kv"].get("Side") not in sides:
                 err("%s: bad Side %s" % (name, t["kv"].get("Side")))
             if t["kv"].get("Effect") not in effects:
                 err("%s: bad Effect %s" % (name, t["kv"].get("Effect")))
-            tiers.setdefault(int(t["kv"]["Tier"]), []).append(t["kv"]["Side"])
+            for f_ in ("Allies", "Soviet"):
+                if fac in (None, f_):
+                    tiers.setdefault((f_, int(t["kv"]["Tier"])), []).append(t["kv"]["Side"])
             major = t["kv"].get("Major") == "true"
             if major != (int(t["kv"]["Tier"]) % 3 == 0):
                 err("%s: Major flag wrong at tier %s" % (name, t["kv"]["Tier"]))
@@ -97,9 +101,11 @@ for name, a in actors.items():
             if bad:
                 err("%s: unknown AutoSquad fields %s" % (name, sorted(bad)))
     if ids:
-        n_t = len(tiers)
-        if n_t not in (6, 9) or sorted(tiers) != list(range(1, n_t + 1)) or any(sorted(v) != ["Quality", "Quantity"] for v in tiers.values()):
-            err("%s: helix must have one Quantity + one Quality node on every tier (6 or 9 tiers)" % name)
+        for f_ in ("Allies", "Soviet"):
+            ts = {k[1]: v for k, v in tiers.items() if k[0] == f_}
+            n_t = len(ts)
+            if n_t not in (6, 9) or sorted(ts) != list(range(1, n_t + 1)) or any(sorted(v) != ["Quality", "Quantity"] for v in ts.values()):
+                err("%s (%s): helix must have one Quantity + one Quality node on every tier (6 or 9 tiers)" % (name, f_))
         # every granted condition must be consumed by a trait of this actor or by ^BasicBuilding
         for t in a["traits"]:
             if t["name"].startswith("HelixNode@") and t["kv"].get("Effect") == "Condition":

@@ -32,7 +32,8 @@ namespace OpenRA.Mods.AutoForce.Widgets
 
 		const int HeaderHeight = 40;
 		const int FooterHeight = 150;
-		const int MinRowHeight = 28;
+		const int MinRowHeight = 24;
+		const int ButtonsBlock = 82; // the button grid below the panel (66px + margins)
 		const int MaxRowHeight = 44;
 		const int MinorRadius = 11;
 		const int MajorRadius = 15;
@@ -157,7 +158,7 @@ namespace OpenRA.Mods.AutoForce.Widgets
 			if (demand != null)
 			{
 				var scr = Game.Renderer.Resolution;
-				Bounds = new WidgetBounds(scr.Width - SidebarRightMargin, SidebarTop, PanelWidth, 128);
+				Bounds = new WidgetBounds(scr.Width - SidebarRightMargin, scr.Height - ButtonsBlock - 128, PanelWidth, 128);
 				var m = Viewport.LastMousePos;
 				buildButtonHovered = BuildButtonRect().Contains(m);
 				hovered = null;
@@ -174,10 +175,10 @@ namespace OpenRA.Mods.AutoForce.Widgets
 
 			maxTier = squad.MaxTier;
 			var screen = Game.Renderer.Resolution;
-			var available = screen.Height - SidebarTop - 8;
+			var available = screen.Height - ButtonsBlock - SidebarTop - 8;
 			rowHeight = Math.Max(MinRowHeight, Math.Min(MaxRowHeight, (available - HeaderHeight - FooterHeight) / Math.Max(1, maxTier)));
 			var height = HeaderHeight + maxTier * rowHeight + FooterHeight;
-			Bounds = new WidgetBounds(screen.Width - SidebarRightMargin, SidebarTop, PanelWidth, height);
+			Bounds = new WidgetBounds(screen.Width - SidebarRightMargin, screen.Height - ButtonsBlock - height, PanelWidth, height);
 
 			var mouse = Viewport.LastMousePos;
 			buildButtonHovered = BuildButtonRect().Contains(mouse);
