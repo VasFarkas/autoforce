@@ -50,7 +50,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 
 		public HelixGroupState Get(string group, Actor building)
 		{
-			var key = string.IsNullOrEmpty(group) ? "actor:" + building.ActorID : group;
+			var key = string.IsNullOrEmpty(group) ? "type:" + building.Info.Name : group;
 			HelixGroupState s;
 			if (!groups.TryGetValue(key, out s))
 			{

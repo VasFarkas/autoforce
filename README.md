@@ -64,6 +64,14 @@ The country variants (England, France, Germany, Russia, Ukraine) are gone; you p
 
 Same tree, same costs and times for both sides: only the unit each node gives differs. Maps that force a removed country as a player's faction will not load; normal skirmish maps use Random.
 
+## Reinforcement cooldown
+
+Barracks wait **30 s**, factories and the air and naval buildings **60 s** after a loss, then train every missing unit in quick succession (about half a second each). Losses during the wait join the same wave; losses during a wave start a new cooldown once it finishes. A full squad waits until someone dies. A new building starts with the cooldown too. Edit `INFANTRY_COOLDOWN_S`, `VEHICLE_COOLDOWN_S` and `WAVE_SPAWN_TICKS` in `tools/generate.py`. The refinery still trickles out harvesters one at a time.
+
+## One tree for all buildings of a kind
+
+Every upgrade tree is shared by all buildings it fits. Two Helipads, three Refineries or two Construction Yards each use ONE tree: research a node once and every building of that type gets it, including ones you build later. The barracks share one infantry tree and the factories one factory tree (below). Per-building effects stack: each Refinery adds its own extra harvesters and silo storage, each Yard its own power.
+
 ## Universal infantry and factory trees
 
 The Infantry, Anti-Armor and Demolition Barracks share ONE infantry tree, and the Main, Utility and Siege Factories share ONE factory tree. Each node is researched once (one at a time for the whole tree):
@@ -98,4 +106,4 @@ Each building carries a coloured text badge in the world (INF green, AT red, DEM
 
 ## If a building does not train units
 
-Select it and look at the bottom of the sidebar panel. The status line says what it is doing ("Next: Rifle Infantry in 4s", "Squad is at full strength") or what is blocking it in red ("no free exit...", "production is disabled...", "unknown actor ..."). The small text at the top of the panel shows the build number (currently `AutoForce build 8`); if you do not see it, the old DLL is still being used. The same messages are written to OpenRA's `debug.log` (Windows: `%APPDATA%\OpenRA\Logs\`).
+Select it and look at the bottom of the sidebar panel. The status line says what it is doing ("Next: Rifle Infantry in 4s", "Squad is at full strength") or what is blocking it in red ("no free exit...", "production is disabled...", "unknown actor ..."). The small text at the top of the panel shows the build number (currently `AutoForce build 12`); if you do not see it, the old DLL is still being used. The same messages are written to OpenRA's `debug.log` (Windows: `%APPDATA%\OpenRA\Logs\`).

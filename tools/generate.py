@@ -651,8 +651,9 @@ def building_yaml(b):
               "\tProvidesPrerequisite@barr:", "\t\tPrerequisite: barr"]
     L += ["\tAutoSquad:",
           "\t\tProductionType: %s" % b["ptype"],
-          "\t\tSpawnInterval: %d" % b["interval"],
-          "\t\tInitialDelay: %d" % (75 if not b["vehicles"] else 150)]
+          "\t\tSpawnInterval: %d" % WAVE_SPAWN_TICKS,
+          "\t\tInitialDelay: %d" % (75 if not b["vehicles"] else 150),
+          "\t\tWaveCooldown: %d" % ((VEHICLE_COOLDOWN_S if b["vehicles"] else INFANTRY_COOLDOWN_S) * TICKS_PER_SECOND)]
     if b.get("group"):
         L.append("\t\tTreeGroup: %s" % b["group"])
     L.append("\t\tRoster:")
@@ -692,7 +693,12 @@ def inplace_yaml(b):
     L += ["\tAutoSquad:"]
     if b.get("ptype"):
         L.append("\t\tProductionType: %s" % b["ptype"])
-    L += ["\t\tSpawnInterval: %d" % b["interval"], "\t\tInitialDelay: %d" % b["initial"]]
+    if b["actor"] in ("HPAD", "AFLD", "SYRD", "SPEN"):
+        # air and naval: same cooldown / wave behaviour as the vehicle factories
+        L += ["\t\tSpawnInterval: %d" % WAVE_SPAWN_TICKS, "\t\tInitialDelay: %d" % b["initial"],
+              "\t\tWaveCooldown: %d" % (VEHICLE_COOLDOWN_S * TICKS_PER_SECOND)]
+    else:
+        L += ["\t\tSpawnInterval: %d" % b["interval"], "\t\tInitialDelay: %d" % b["initial"]]
     if b.get("harvesters"):
         L.append("\t\tAffectsAllHarvesters: true")
     if b.get("overrides"):
@@ -818,6 +824,7 @@ def sequences_yaml():
 
 def fluent():
     L = ["## AutoForce", "",
+
          "autoforce-faction-allies =", "    .name = Allies",
          "    .description = The Allied army: rifle, sniper and Tanya infantry, medics and spies, light, medium and Patton tanks, artillery, chrono and phase tanks.", "",
          "autoforce-faction-soviet =", "    .name = Soviets",
@@ -902,6 +909,11 @@ def validate(root):
         if parent not in known:
             problems.append("custom unit %s: parent %s unknown" % (name, parent))
     return problems
+
+
+INFANTRY_COOLDOWN_S = 30   # barracks: wait this long after a loss before the replacements appear
+VEHICLE_COOLDOWN_S = 60    # factories
+WAVE_SPAWN_TICKS = 12      # each missing unit is trained in about half a second
 
 
 def main():

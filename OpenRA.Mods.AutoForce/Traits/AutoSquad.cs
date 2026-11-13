@@ -43,6 +43,10 @@ namespace OpenRA.Mods.AutoForce.Traits
 		[Desc("Ticks before the first spawn after the building is created.")]
 		public readonly int InitialDelay = 50;
 
+		[Desc("Cooldown / wave mode when above 0: after the squad loses units, wait this many ticks, then train every missing unit " +
+			"one after another (SpawnInterval apart). The cooldown only restarts once the wave is done and someone is missing again.")]
+		public readonly int WaveCooldown = 0;
+
 		[Desc("Charge the unit's Valued cost from the owner's cash for every spawned unit. Squads are free by default; " +
 			"the squad size is the limit.")]
 		public readonly bool PayForUnits = false;
@@ -51,7 +55,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 		public readonly string PanelTitle = "";
 
 		[Desc("Buildings with the same tree group share one research state: a node is bought once and every building " +
-			"of the group applies its own version of it. Empty = this building has a private tree.")]
+			"of the group applies its own version of it. Empty = all buildings of the same type share one tree.")]
 		public readonly string TreeGroup = "";
 
 		public override object Create(ActorInitializer init) { return new AutoSquad(init.Self, this); }
@@ -60,7 +64,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 	public class AutoSquad : ITick, IResolveOrder, INotifyProduction, INotifyOwnerChanged, INotifyActorDisposing, INotifyKilled
 	{
 		public const string ResearchOrder = "AutoForceResearch";
-		public const string BuildStamp = "AutoForce build 8";
+		public const string BuildStamp = "AutoForce build 12";
 
 		public readonly AutoSquadInfo Info;
 		public readonly List<HelixNodeInfo> Nodes;
@@ -75,6 +79,8 @@ namespace OpenRA.Mods.AutoForce.Traits
 		Production production;
 		string lastElite;
 		int spawnTimer;
+		int cooldownLeft;
+		readonly List<string> wave = new List<string>();
 		int speedBonus, damageBonus, fireRateBonus, armorBonus, storageBonus;
 		bool storageApplied;
 		readonly List<int> conditionTokens = new List<int>();
@@ -451,6 +457,12 @@ namespace OpenRA.Mods.AutoForce.Traits
 			if (Info.AffectsAllHarvesters && (self.World.WorldTick + self.ActorID) % 25 == 0)
 				ApplyToAllHarvesters();
 
+			if (Info.WaveCooldown > 0)
+			{
+				WaveTick();
+				return;
+			}
+
 			if (spawnTimer > 0)
 				spawnTimer--;
 
@@ -469,14 +481,98 @@ namespace OpenRA.Mods.AutoForce.Traits
 				return;
 			}
 
+			if (TrySpawn(next))
+				spawnTimer = Info.SpawnInterval;
+			else
+				spawnTimer = 25;
+		}
+
+		/// <summary>Cooldown / wave mode: after losses wait WaveCooldown ticks, then train every missing unit in quick succession.</summary>
+		void WaveTick()
+		{
+			if (unitOrder.Count == 0)
+			{
+				Status = "Upgrades apply to your whole base";
+				StatusIsProblem = false;
+				return;
+			}
+
+			if (spawnTimer > 0)
+				spawnTimer--;
+
+			if (wave.Count > 0)
+			{
+				if (spawnTimer > 0)
+				{
+					Status = "Training: " + wave.Count + " left";
+					StatusIsProblem = false;
+					return;
+				}
+
+				var u = wave[0];
+				if (CountAlive(u) >= target[u])
+				{
+					wave.RemoveAt(0);
+					return;
+				}
+
+				if (TrySpawn(u))
+				{
+					wave.RemoveAt(0);
+					spawnTimer = Info.SpawnInterval;
+				}
+				else
+					spawnTimer = 25;
+
+				return;
+			}
+
+			if (cooldownLeft > 0)
+			{
+				if (--cooldownLeft == 0)
+				{
+					foreach (var unit in unitOrder)
+						for (var i = target[unit] - CountAlive(unit); i > 0; i--)
+							wave.Add(unit);
+
+					spawnTimer = 0;
+					return;
+				}
+
+				Status = "Reinforcements in " + ((cooldownLeft + 24) / 25) + "s (" + MissingCount() + " missing)";
+				StatusIsProblem = false;
+				return;
+			}
+
+			if (MissingCount() == 0)
+			{
+				Status = "Squad is at full strength";
+				StatusIsProblem = false;
+				return;
+			}
+
+			cooldownLeft = Info.WaveCooldown;
+		}
+
+		int MissingCount()
+		{
+			var n = 0;
+			foreach (var u in unitOrder)
+				n += Math.Max(0, target[u] - CountAlive(u));
+
+			return n;
+		}
+
+		/// <summary>Tries to train one unit; sets the status line. Returns true if it appeared.</summary>
+		bool TrySpawn(string next)
+		{
 			if (production == null)
 				production = self.TraitOrDefault<Production>();
 
 			if (production == null)
 			{
 				Block("this building has no Production trait");
-				spawnTimer = 25;
-				return;
+				return false;
 			}
 
 			ActorInfo actorInfo;
@@ -484,7 +580,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 			{
 				Block("unknown actor '" + next + "' in the roster, dropped it");
 				target[next] = 0;
-				return;
+				return false;
 			}
 
 			var cost = 0;
@@ -498,8 +594,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 			if (resources.GetCashAndResources() < cost)
 			{
 				Block("waiting for funds ($" + cost + ")");
-				spawnTimer = 25;
-				return;
+				return false;
 			}
 
 			var inits = new TypeDictionary
@@ -516,7 +611,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 				Status = "Trained " + UnitDisplayName(self, next);
 				StatusIsProblem = false;
 				lastLogged = null;
-				spawnTimer = Info.SpawnInterval;
+				return true;
 			}
 			else
 			{
@@ -529,7 +624,7 @@ namespace OpenRA.Mods.AutoForce.Traits
 				else
 					Block("no free exit: the cells outside the building are blocked");
 
-				spawnTimer = 25;
+				return false;
 			}
 		}
 	}
